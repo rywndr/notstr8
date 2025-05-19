@@ -1,7 +1,14 @@
 'use client';
 
-import { useRef, useState, FormEvent, ChangeEvent } from 'react';
-import { addCommunityMember } from '@/app/actions';
+import { useRef, useState, FormEvent } from 'react';
+import { addCommunityMember } from '@/actions';
+import { 
+  handleDigitInput, 
+  handlePhoneInput, 
+  handleRupiahInput,
+  handleDateOfBirthChange,
+  handleAgeChange
+} from '@/utils/formHandlers';
 
 export default function CommunityForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -9,15 +16,15 @@ export default function CommunityForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasBpjs, setHasBpjs] = useState(false);
   const [hasDiscrimination, setHasDiscrimination] = useState(false);
+  const [discriminationExperience, setDiscriminationExperience] = useState("");
   const [hasReceivedTraining, setHasReceivedTraining] = useState(false);
   const [employmentStatus, setEmploymentStatus] = useState("");
   const [hasEktp, setHasEktp] = useState(false);
   const [hasOwnBusiness, setHasOwnBusiness] = useState(false);
-
-  // handle digit-only input
-  const handleDigitInput = (e: ChangeEvent<HTMLInputElement>) => {
-    e.target.value = e.target.value.replace(/\D/g, ''); // rm any non-digit characters
-  };
+  const [isStillStudying, setIsStillStudying] = useState(false);
+  const [educationLevel, setEducationLevel] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<string>("");
+  const [age, setAge] = useState<string>("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,6 +41,19 @@ export default function CommunityForm() {
     } else if (result?.success) {
       setMessage(result.success);
       formRef.current?.reset(); // Reset form on success
+      
+      // Reset all state variables
+      setHasBpjs(false);
+      setHasDiscrimination(false);
+      setDiscriminationExperience("");
+      setHasReceivedTraining(false);
+      setEmploymentStatus("");
+      setHasEktp(false);
+      setHasOwnBusiness(false);
+      setIsStillStudying(false);
+      setEducationLevel("");
+      setDateOfBirth("");
+      setAge("");
     } else {
       setMessage('Terjadi kesalahan yang tidak diketahui.');
     }
@@ -79,7 +99,14 @@ export default function CommunityForm() {
 
         <div className="mb-4">
           <label htmlFor="dateOfBirth" className={commonLabelStyle}>Tanggal Lahir</label>
-          <input type="date" name="dateOfBirth" id="dateOfBirth" className={commonInputStyle} />
+          <input 
+            type="date" 
+            name="dateOfBirth" 
+            id="dateOfBirth" 
+            className={commonInputStyle}
+            value={dateOfBirth}
+            onChange={(e) => handleDateOfBirthChange(e, setDateOfBirth, setAge)}
+          />
         </div>
 
         <div className="mb-4">
@@ -89,7 +116,8 @@ export default function CommunityForm() {
             name="age" 
             id="age" 
             className={`${commonInputStyle} [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`} 
-            onInput={handleDigitInput}
+            value={age}
+            onChange={(e) => handleAgeChange(e, setAge, setDateOfBirth)}
           />
         </div>
 
@@ -214,14 +242,22 @@ export default function CommunityForm() {
         <legend className="text-lg font-semibold text-slate-700 px-2">Kontak</legend>
         <div className="mb-4">
           <label htmlFor="phoneNumber" className={commonLabelStyle}>Kontak Yang Bisa Dihubungi</label>
-          <input 
-            type="tel" 
-            name="phoneNumber" 
-            id="phoneNumber" 
-            className={commonInputStyle} 
-            placeholder="Contoh: 081234567890" 
-            onInput={handleDigitInput}
-          />
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 pointer-events-none">
+              +62
+            </span>
+            <input 
+              type="tel" 
+              name="phoneNumber" 
+              id="phoneNumber" 
+              className={`${commonInputStyle} pl-12`} 
+              placeholder="81234567890" 
+              onInput={handlePhoneInput}
+            />
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Format: +62 8xxx-xxxx-xxx (hanya masukkan angka setelah +62, harus diawali dengan 8)
+          </p>
         </div>
       </fieldset>
 
@@ -238,7 +274,18 @@ export default function CommunityForm() {
         </div>
         <div className="mb-4">
           <label htmlFor="lastEducation" className={commonLabelStyle}>Pendidikan Terakhir</label>
-          <select name="lastEducation" id="lastEducation" className={commonInputStyle}>
+          <select 
+            name="lastEducation" 
+            id="lastEducation" 
+            className={commonInputStyle}
+            value={educationLevel}
+            onChange={(e) => {
+              setEducationLevel(e.target.value);
+              if (e.target.value === "TIDAK_SEKOLAH") {
+                setIsStillStudying(false); // Uncheck "Masih Sekolah/Kuliah" when "Tidak Sekolah" is selected
+              }
+            }}
+          >
             <option value="">Pilih Pendidikan</option>
             <option value="SD">SD</option>
             <option value="SMP">SMP</option>
@@ -247,8 +294,16 @@ export default function CommunityForm() {
             <option value="TIDAK_SEKOLAH">Tidak Sekolah</option>
           </select>
         </div>
-        <div className="flex items-center mt-2 mb-4">
-          <input type="checkbox" name="isStillStudying" id="isStillStudying" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+        <div className={`flex items-center mt-2 mb-4 ${educationLevel === "TIDAK_SEKOLAH" ? 'opacity-50' : ''}`}>
+          <input 
+            type="checkbox" 
+            name="isStillStudying" 
+            id="isStillStudying" 
+            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+            checked={isStillStudying}
+            onChange={(e) => setIsStillStudying(e.target.checked)}
+            disabled={educationLevel === "TIDAK_SEKOLAH"}
+          />
           <label htmlFor="isStillStudying" className="ml-2 block text-sm text-slate-900">Masih Sekolah/Kuliah?</label>
         </div>
         <div className="mb-4">
@@ -280,14 +335,19 @@ export default function CommunityForm() {
         </div>
         <div className="mb-4">
           <label htmlFor="monthlyIncome" className={commonLabelStyle}>Pendapatan Bulanan</label>
-          <input 
-            type="text" 
-            name="monthlyIncome" 
-            id="monthlyIncome" 
-            className={commonInputStyle} 
-            placeholder="Contoh: 1000000" 
-            onInput={handleDigitInput}
-          />
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 pointer-events-none">
+              Rp
+            </span>
+            <input 
+              type="text" 
+              name="monthlyIncome" 
+              id="monthlyIncome" 
+              className={`${commonInputStyle} pl-10`} 
+              placeholder="1.000.000" 
+              onInput={handleRupiahInput}
+            />
+          </div>
         </div>
         <div className="flex items-center mt-2 mb-4">
           <input 
@@ -407,8 +467,11 @@ export default function CommunityForm() {
             name="discriminationExperience" 
             id="discriminationExperience" 
             className={commonInputStyle}
-            onChange={(e) => setHasDiscrimination(e.target.value === "PERNAH_MENGALAMI")}
-            value={hasDiscrimination ? "PERNAH_MENGALAMI" : ""}
+            onChange={(e) => {
+              setDiscriminationExperience(e.target.value);
+              setHasDiscrimination(e.target.value === "PERNAH_MENGALAMI");
+            }}
+            value={discriminationExperience}
           >
             <option value="">Pilih Pengalaman</option>
             <option value="TIDAK_PERNAH">Tidak Pernah</option>

@@ -19,6 +19,11 @@ import {
 // Type for form data (excluding id, createdAt, updatedAt which are auto-generated/managed)
 export type CommunityMemberFormData = Omit<CommunityMember, 'id' | 'createdAt' | 'updatedAt'>;
 
+/**
+ * Server action to add a new community member
+ * @param formData Form data containing community member details
+ * @returns Object with success message or error
+ */
 export async function addCommunityMember(formData: FormData) {
   try {
     const data: Partial<CommunityMemberFormData> = {
@@ -41,28 +46,27 @@ export async function addCommunityMember(formData: FormData) {
       city: formData.get('city') as string,
       residencyStatus: formData.get('residencyStatus') as ResidencyStatus || null,
       livingSituation: formData.get('livingSituation') as LivingSituation || null,
-      phoneNumber: formData.get('phoneNumber') as string || null,
-      serviceContactPerson: formData.get('serviceContactPerson') as string || null,
+      phoneNumber: formData.get('phoneNumber') ? `+62${formData.get('phoneNumber')}` as string : null,
       maritalStatus: formData.get('maritalStatus') as MaritalStatus || null,
       lastEducation: formData.get('lastEducation') as EducationLevel || null,
       isStillStudying: formData.get('isStillStudying') === 'on',
       employmentStatus: formData.get('employmentStatus') as EmploymentStatus || null,
-      jobDescription: formData.get('jobDescription') as string || null,
-      monthlyIncome: formData.get('monthlyIncome') as string || null,
+      jobDescription: formData.get('employmentStatus') === 'BEKERJA' ? (formData.get('jobDescription') as string || null) : null,
+      monthlyIncome: formData.get('monthlyIncome') ? (formData.get('monthlyIncome') as string).replace(/\D/g, '') : null,
       hasOwnBusiness: formData.get('hasOwnBusiness') === 'on',
-      businessDetails: formData.get('businessDetails') as string || null,
+      businessDetails: formData.get('hasOwnBusiness') === 'on' ? (formData.get('businessDetails') as string || null) : null,
       hasReceivedSkillTraining: formData.get('hasReceivedSkillTraining') === 'on',
-      skillTrainingType: formData.get('skillTrainingType') as string || null,
+      skillTrainingType: formData.get('hasReceivedSkillTraining') === 'on' ? (formData.get('skillTrainingType') as string || null) : null,
       desiredSkillTraining: formData.get('desiredSkillTraining') as string || null,
       hasBpjs: formData.get('hasBpjs') === 'on',
-      bpjsId: formData.get('bpjsId') as string || null,
+      bpjsId: formData.get('hasBpjs') === 'on' ? (formData.get('bpjsId') as string || null) : null,
       healthServiceAccess: formData.get('healthServiceAccess') as HealthServiceAccess || null,
       chronicIllness: formData.get('chronicIllness') as string || null,
       discriminationExperience: formData.get('discriminationExperience') as DiscriminationExperience || null,
-      discriminationType: formData.get('discriminationType') as string || null,
-      discriminationPerpetrator: formData.get('discriminationPerpetrator') as string || null,
-      discriminationLocation: formData.get('discriminationLocation') as string || null,
-      wasDiscriminationReported: formData.get('wasDiscriminationReported') === 'on',
+      discriminationType: formData.get('discriminationExperience') === 'PERNAH_MENGALAMI' ? (formData.get('discriminationType') as string || null) : null,
+      discriminationPerpetrator: formData.get('discriminationExperience') === 'PERNAH_MENGALAMI' ? (formData.get('discriminationPerpetrator') as string || null) : null,
+      discriminationLocation: formData.get('discriminationExperience') === 'PERNAH_MENGALAMI' ? (formData.get('discriminationLocation') as string || null) : null,
+      wasDiscriminationReported: formData.get('discriminationExperience') === 'PERNAH_MENGALAMI' && formData.get('wasDiscriminationReported') === 'on',
       receivesSocialAssistance: formData.get('receivesSocialAssistance') === 'on',
       isRegisteredInDTKS: formData.get('isRegisteredInDTKS') === 'on',
       communityGroup: formData.get('communityGroup') as string || null,
@@ -74,19 +78,24 @@ export async function addCommunityMember(formData: FormData) {
     // For now, I'll just use placeholders if files are provided.
 
     const idScanFile = formData.get('idScanUrl') as File;
-    if (idScanFile && idScanFile.size > 0) {
+    if (formData.get('ektpStatus') === 'MEMILIKI' && idScanFile && idScanFile.size > 0) {
       data.idScanUrl = `/uploads/id_scans/${Date.now()}_${idScanFile.name}`; // Placeholder URL
       // TODO: Implement actual file upload logic for idScanFile
     }
 
     const bpjsScanFile = formData.get('bpjsScanUrl') as File;
-    if (bpjsScanFile && bpjsScanFile.size > 0) {
+    if (formData.get('hasBpjs') === 'on' && bpjsScanFile && bpjsScanFile.size > 0) {
       data.bpjsScanUrl = `/uploads/bpjs_scans/${Date.now()}_${bpjsScanFile.name}`; // Placeholder URL
       // TODO: Implement actual file upload logic for bpjsScanFile
     }
 
     if (!data.firstName || !data.city) {
       return { error: 'Nama Depan dan Kota wajib diisi.' };
+    }
+    
+    // Validate phone number format if provided
+    if (data.phoneNumber && !data.phoneNumber.startsWith('+628')) {
+      return { error: 'Format nomor telepon tidak valid. Harus diawali dengan 8 setelah kode negara +62.' };
     }
 
     await prisma.communityMember.create({
@@ -101,6 +110,10 @@ export async function addCommunityMember(formData: FormData) {
   }
 }
 
+/**
+ * Server action to get all community members
+ * @returns Array of community members
+ */
 export async function getCommunityMembers(): Promise<CommunityMember[]> {
   try {
     return await prisma.communityMember.findMany({

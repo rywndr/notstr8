@@ -1,5 +1,5 @@
 import CommunityForm from '@/components/CommunityForm';
-import { getCommunityMembers } from '@/app/actions';
+import { getCommunityMembers } from '@/actions';
 import { CommunityMember } from '../../prisma/app/generated/prisma';
 
 export const dynamic = 'force-dynamic'; // Ensure data is fetched on every request
@@ -13,7 +13,7 @@ export default async function Home() {
   const fileLinkStyle = "text-sky-600 hover:text-sky-800 underline";
 
   return (
-    <div className="min-h-screen bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+   <div className="min-h-screen bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto flex flex-col items-center gap-10">
         <header className="text-center">
           <h1 className="text-4xl font-bold text-slate-800 mb-4">Pendataan Komunitas</h1>
@@ -21,8 +21,8 @@ export default async function Home() {
         </header>
 
         <CommunityForm />
-
-        <section className="w-full max-w-4xl mt-12">
+        
+         <section className="w-full max-w-4xl mt-12">
           <h2 className="text-3xl font-semibold text-slate-800 mb-8 text-center">Data Terdaftar</h2>
           {members.length === 0 ? (
             <p className="text-center text-slate-500">Belum ada data yang terdaftar.</p>
@@ -57,19 +57,14 @@ export default async function Home() {
 
                   <h4 className="text-lg font-semibold text-slate-700 mt-4 mb-1">Kontak:</h4>
                   <p className={textStyle}><span className="font-semibold">Kontak Yang Bisa Dihubungi:</span> {member.phoneNumber || '-'}</p>
-                  <p className={textStyle}><span className="font-semibold">Kontak Layanan:</span> {member.serviceContactPerson || '-'}</p>
 
                   <h4 className="text-lg font-semibold text-slate-700 mt-4 mb-1">Status Sosial & Ekonomi:</h4>
                   <p className={textStyle}><span className="font-semibold">Status Perkawinan:</span> {member.maritalStatus || '-'}</p>
                   <p className={textStyle}><span className="font-semibold">Pendidikan Terakhir:</span> {member.lastEducation || '-'}</p>
                   <p className={textStyle}><span className="font-semibold">Masih Sekolah/Kuliah:</span> {member.isStillStudying === null ? '-' : member.isStillStudying ? 'Ya' : 'Tidak'}</p>
                   <p className={textStyle}><span className="font-semibold">Status Pekerjaan:</span> {member.employmentStatus || '-'}</p>
-                  <p className={textStyle}><span className="font-semibold">Jenis Pekerjaan:</span> {member.jobDescription || '-'}</p>
-                  <p className={textStyle}><span className="font-semibold">Pendapatan Bulanan:</span> {member.monthlyIncome || '-'}</p>
+                  <p className={textStyle}><span className="font-semibold">Pendapatan Bulanan:</span> Rp {member.monthlyIncome || '-'}</p>
                   <p className={textStyle}><span className="font-semibold">Kepemilikan Usaha:</span> {member.hasOwnBusiness === null ? '-' : member.hasOwnBusiness ? 'Ya' : 'Tidak'}</p>
-                  {member.hasOwnBusiness && member.businessDetails && (
-                    <p className={textStyle}><span className="font-semibold">Detail Usaha:</span> {member.businessDetails}</p>
-                  )}
                   
                   <h4 className="text-lg font-semibold text-slate-700 mt-4 mb-1">Pelatihan:</h4>
                   <p className={textStyle}><span className="font-semibold">Mendapatkan Pelatihan Keterampilan:</span> {member.hasReceivedSkillTraining === null ? '-' : member.hasReceivedSkillTraining ? 'Ya' : 'Tidak'}</p>
