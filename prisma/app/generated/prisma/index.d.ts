@@ -93,6 +93,25 @@ export const DiscriminationExperience: {
 
 export type DiscriminationExperience = (typeof DiscriminationExperience)[keyof typeof DiscriminationExperience]
 
+
+export const MaritalStatus: {
+  BELUM_KAWIN: 'BELUM_KAWIN',
+  KAWIN: 'KAWIN',
+  CERAI: 'CERAI'
+};
+
+export type MaritalStatus = (typeof MaritalStatus)[keyof typeof MaritalStatus]
+
+
+export const EmploymentStatus: {
+  BEKERJA: 'BEKERJA',
+  TIDAK_BEKERJA: 'TIDAK_BEKERJA',
+  PELAJAR: 'PELAJAR',
+  MAHASISWA: 'MAHASISWA'
+};
+
+export type EmploymentStatus = (typeof EmploymentStatus)[keyof typeof EmploymentStatus]
+
 }
 
 export type Gender = $Enums.Gender
@@ -126,6 +145,14 @@ export const HealthServiceAccess: typeof $Enums.HealthServiceAccess
 export type DiscriminationExperience = $Enums.DiscriminationExperience
 
 export const DiscriminationExperience: typeof $Enums.DiscriminationExperience
+
+export type MaritalStatus = $Enums.MaritalStatus
+
+export const MaritalStatus: typeof $Enums.MaritalStatus
+
+export type EmploymentStatus = $Enums.EmploymentStatus
+
+export const EmploymentStatus: typeof $Enums.EmploymentStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -1023,10 +1050,11 @@ export namespace Prisma {
     livingSituation: $Enums.LivingSituation | null
     phoneNumber: string | null
     serviceContactPerson: string | null
-    maritalStatus: string | null
+    maritalStatus: $Enums.MaritalStatus | null
     lastEducation: $Enums.EducationLevel | null
     isStillStudying: boolean | null
-    employmentStatus: string | null
+    employmentStatus: $Enums.EmploymentStatus | null
+    jobDescription: string | null
     monthlyIncome: string | null
     hasOwnBusiness: boolean | null
     hasReceivedSkillTraining: boolean | null
@@ -1045,7 +1073,6 @@ export namespace Prisma {
     receivesSocialAssistance: boolean | null
     isRegisteredInDTKS: boolean | null
     communityGroup: string | null
-    notes: string | null
   }
 
   export type CommunityMemberMaxAggregateOutputType = {
@@ -1074,10 +1101,11 @@ export namespace Prisma {
     livingSituation: $Enums.LivingSituation | null
     phoneNumber: string | null
     serviceContactPerson: string | null
-    maritalStatus: string | null
+    maritalStatus: $Enums.MaritalStatus | null
     lastEducation: $Enums.EducationLevel | null
     isStillStudying: boolean | null
-    employmentStatus: string | null
+    employmentStatus: $Enums.EmploymentStatus | null
+    jobDescription: string | null
     monthlyIncome: string | null
     hasOwnBusiness: boolean | null
     hasReceivedSkillTraining: boolean | null
@@ -1096,7 +1124,6 @@ export namespace Prisma {
     receivesSocialAssistance: boolean | null
     isRegisteredInDTKS: boolean | null
     communityGroup: string | null
-    notes: string | null
   }
 
   export type CommunityMemberCountAggregateOutputType = {
@@ -1129,6 +1156,7 @@ export namespace Prisma {
     lastEducation: number
     isStillStudying: number
     employmentStatus: number
+    jobDescription: number
     monthlyIncome: number
     hasOwnBusiness: number
     hasReceivedSkillTraining: number
@@ -1147,7 +1175,6 @@ export namespace Prisma {
     receivesSocialAssistance: number
     isRegisteredInDTKS: number
     communityGroup: number
-    notes: number
     _all: number
   }
 
@@ -1190,6 +1217,7 @@ export namespace Prisma {
     lastEducation?: true
     isStillStudying?: true
     employmentStatus?: true
+    jobDescription?: true
     monthlyIncome?: true
     hasOwnBusiness?: true
     hasReceivedSkillTraining?: true
@@ -1208,7 +1236,6 @@ export namespace Prisma {
     receivesSocialAssistance?: true
     isRegisteredInDTKS?: true
     communityGroup?: true
-    notes?: true
   }
 
   export type CommunityMemberMaxAggregateInputType = {
@@ -1241,6 +1268,7 @@ export namespace Prisma {
     lastEducation?: true
     isStillStudying?: true
     employmentStatus?: true
+    jobDescription?: true
     monthlyIncome?: true
     hasOwnBusiness?: true
     hasReceivedSkillTraining?: true
@@ -1259,7 +1287,6 @@ export namespace Prisma {
     receivesSocialAssistance?: true
     isRegisteredInDTKS?: true
     communityGroup?: true
-    notes?: true
   }
 
   export type CommunityMemberCountAggregateInputType = {
@@ -1292,6 +1319,7 @@ export namespace Prisma {
     lastEducation?: true
     isStillStudying?: true
     employmentStatus?: true
+    jobDescription?: true
     monthlyIncome?: true
     hasOwnBusiness?: true
     hasReceivedSkillTraining?: true
@@ -1310,7 +1338,6 @@ export namespace Prisma {
     receivesSocialAssistance?: true
     isRegisteredInDTKS?: true
     communityGroup?: true
-    notes?: true
     _all?: true
   }
 
@@ -1426,10 +1453,11 @@ export namespace Prisma {
     livingSituation: $Enums.LivingSituation | null
     phoneNumber: string | null
     serviceContactPerson: string | null
-    maritalStatus: string | null
+    maritalStatus: $Enums.MaritalStatus | null
     lastEducation: $Enums.EducationLevel | null
     isStillStudying: boolean | null
-    employmentStatus: string | null
+    employmentStatus: $Enums.EmploymentStatus | null
+    jobDescription: string | null
     monthlyIncome: string | null
     hasOwnBusiness: boolean | null
     hasReceivedSkillTraining: boolean | null
@@ -1448,7 +1476,6 @@ export namespace Prisma {
     receivesSocialAssistance: boolean | null
     isRegisteredInDTKS: boolean | null
     communityGroup: string | null
-    notes: string | null
     _count: CommunityMemberCountAggregateOutputType | null
     _avg: CommunityMemberAvgAggregateOutputType | null
     _sum: CommunityMemberSumAggregateOutputType | null
@@ -1500,6 +1527,7 @@ export namespace Prisma {
     lastEducation?: boolean
     isStillStudying?: boolean
     employmentStatus?: boolean
+    jobDescription?: boolean
     monthlyIncome?: boolean
     hasOwnBusiness?: boolean
     hasReceivedSkillTraining?: boolean
@@ -1518,7 +1546,6 @@ export namespace Prisma {
     receivesSocialAssistance?: boolean
     isRegisteredInDTKS?: boolean
     communityGroup?: boolean
-    notes?: boolean
   }, ExtArgs["result"]["communityMember"]>
 
   export type CommunityMemberSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1551,6 +1578,7 @@ export namespace Prisma {
     lastEducation?: boolean
     isStillStudying?: boolean
     employmentStatus?: boolean
+    jobDescription?: boolean
     monthlyIncome?: boolean
     hasOwnBusiness?: boolean
     hasReceivedSkillTraining?: boolean
@@ -1569,7 +1597,6 @@ export namespace Prisma {
     receivesSocialAssistance?: boolean
     isRegisteredInDTKS?: boolean
     communityGroup?: boolean
-    notes?: boolean
   }, ExtArgs["result"]["communityMember"]>
 
   export type CommunityMemberSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1602,6 +1629,7 @@ export namespace Prisma {
     lastEducation?: boolean
     isStillStudying?: boolean
     employmentStatus?: boolean
+    jobDescription?: boolean
     monthlyIncome?: boolean
     hasOwnBusiness?: boolean
     hasReceivedSkillTraining?: boolean
@@ -1620,7 +1648,6 @@ export namespace Prisma {
     receivesSocialAssistance?: boolean
     isRegisteredInDTKS?: boolean
     communityGroup?: boolean
-    notes?: boolean
   }, ExtArgs["result"]["communityMember"]>
 
   export type CommunityMemberSelectScalar = {
@@ -1653,6 +1680,7 @@ export namespace Prisma {
     lastEducation?: boolean
     isStillStudying?: boolean
     employmentStatus?: boolean
+    jobDescription?: boolean
     monthlyIncome?: boolean
     hasOwnBusiness?: boolean
     hasReceivedSkillTraining?: boolean
@@ -1671,10 +1699,9 @@ export namespace Prisma {
     receivesSocialAssistance?: boolean
     isRegisteredInDTKS?: boolean
     communityGroup?: boolean
-    notes?: boolean
   }
 
-  export type CommunityMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "middleName" | "lastName" | "communityNickname" | "placeOfBirth" | "dateOfBirth" | "age" | "gender" | "genderIdentity" | "nik" | "idScanUrl" | "familyCardNumber" | "ektpStatus" | "address" | "domicileKelurahan" | "domicileKecamatan" | "domicileRegencyCity" | "city" | "residencyStatus" | "livingSituation" | "phoneNumber" | "serviceContactPerson" | "maritalStatus" | "lastEducation" | "isStillStudying" | "employmentStatus" | "monthlyIncome" | "hasOwnBusiness" | "hasReceivedSkillTraining" | "skillTrainingType" | "desiredSkillTraining" | "hasBpjs" | "bpjsId" | "bpjsScanUrl" | "healthServiceAccess" | "chronicIllness" | "discriminationExperience" | "discriminationType" | "discriminationPerpetrator" | "discriminationLocation" | "wasDiscriminationReported" | "receivesSocialAssistance" | "isRegisteredInDTKS" | "communityGroup" | "notes", ExtArgs["result"]["communityMember"]>
+  export type CommunityMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "middleName" | "lastName" | "communityNickname" | "placeOfBirth" | "dateOfBirth" | "age" | "gender" | "genderIdentity" | "nik" | "idScanUrl" | "familyCardNumber" | "ektpStatus" | "address" | "domicileKelurahan" | "domicileKecamatan" | "domicileRegencyCity" | "city" | "residencyStatus" | "livingSituation" | "phoneNumber" | "serviceContactPerson" | "maritalStatus" | "lastEducation" | "isStillStudying" | "employmentStatus" | "jobDescription" | "monthlyIncome" | "hasOwnBusiness" | "hasReceivedSkillTraining" | "skillTrainingType" | "desiredSkillTraining" | "hasBpjs" | "bpjsId" | "bpjsScanUrl" | "healthServiceAccess" | "chronicIllness" | "discriminationExperience" | "discriminationType" | "discriminationPerpetrator" | "discriminationLocation" | "wasDiscriminationReported" | "receivesSocialAssistance" | "isRegisteredInDTKS" | "communityGroup", ExtArgs["result"]["communityMember"]>
 
   export type $CommunityMemberPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "CommunityMember"
@@ -1705,10 +1732,11 @@ export namespace Prisma {
       livingSituation: $Enums.LivingSituation | null
       phoneNumber: string | null
       serviceContactPerson: string | null
-      maritalStatus: string | null
+      maritalStatus: $Enums.MaritalStatus | null
       lastEducation: $Enums.EducationLevel | null
       isStillStudying: boolean | null
-      employmentStatus: string | null
+      employmentStatus: $Enums.EmploymentStatus | null
+      jobDescription: string | null
       monthlyIncome: string | null
       hasOwnBusiness: boolean | null
       hasReceivedSkillTraining: boolean | null
@@ -1727,7 +1755,6 @@ export namespace Prisma {
       receivesSocialAssistance: boolean | null
       isRegisteredInDTKS: boolean | null
       communityGroup: string | null
-      notes: string | null
     }, ExtArgs["result"]["communityMember"]>
     composites: {}
   }
@@ -2176,10 +2203,11 @@ export namespace Prisma {
     readonly livingSituation: FieldRef<"CommunityMember", 'LivingSituation'>
     readonly phoneNumber: FieldRef<"CommunityMember", 'String'>
     readonly serviceContactPerson: FieldRef<"CommunityMember", 'String'>
-    readonly maritalStatus: FieldRef<"CommunityMember", 'String'>
+    readonly maritalStatus: FieldRef<"CommunityMember", 'MaritalStatus'>
     readonly lastEducation: FieldRef<"CommunityMember", 'EducationLevel'>
     readonly isStillStudying: FieldRef<"CommunityMember", 'Boolean'>
-    readonly employmentStatus: FieldRef<"CommunityMember", 'String'>
+    readonly employmentStatus: FieldRef<"CommunityMember", 'EmploymentStatus'>
+    readonly jobDescription: FieldRef<"CommunityMember", 'String'>
     readonly monthlyIncome: FieldRef<"CommunityMember", 'String'>
     readonly hasOwnBusiness: FieldRef<"CommunityMember", 'Boolean'>
     readonly hasReceivedSkillTraining: FieldRef<"CommunityMember", 'Boolean'>
@@ -2198,7 +2226,6 @@ export namespace Prisma {
     readonly receivesSocialAssistance: FieldRef<"CommunityMember", 'Boolean'>
     readonly isRegisteredInDTKS: FieldRef<"CommunityMember", 'Boolean'>
     readonly communityGroup: FieldRef<"CommunityMember", 'String'>
-    readonly notes: FieldRef<"CommunityMember", 'String'>
   }
     
 
@@ -2609,6 +2636,7 @@ export namespace Prisma {
     lastEducation: 'lastEducation',
     isStillStudying: 'isStillStudying',
     employmentStatus: 'employmentStatus',
+    jobDescription: 'jobDescription',
     monthlyIncome: 'monthlyIncome',
     hasOwnBusiness: 'hasOwnBusiness',
     hasReceivedSkillTraining: 'hasReceivedSkillTraining',
@@ -2626,8 +2654,7 @@ export namespace Prisma {
     wasDiscriminationReported: 'wasDiscriminationReported',
     receivesSocialAssistance: 'receivesSocialAssistance',
     isRegisteredInDTKS: 'isRegisteredInDTKS',
-    communityGroup: 'communityGroup',
-    notes: 'notes'
+    communityGroup: 'communityGroup'
   };
 
   export type CommunityMemberScalarFieldEnum = (typeof CommunityMemberScalarFieldEnum)[keyof typeof CommunityMemberScalarFieldEnum]
@@ -2775,6 +2802,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'MaritalStatus'
+   */
+  export type EnumMaritalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MaritalStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'MaritalStatus[]'
+   */
+  export type ListEnumMaritalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MaritalStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'EducationLevel'
    */
   export type EnumEducationLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EducationLevel'>
@@ -2792,6 +2833,20 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'EmploymentStatus'
+   */
+  export type EnumEmploymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmploymentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'EmploymentStatus[]'
+   */
+  export type ListEnumEmploymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmploymentStatus[]'>
     
 
 
@@ -2869,10 +2924,11 @@ export namespace Prisma {
     livingSituation?: EnumLivingSituationNullableFilter<"CommunityMember"> | $Enums.LivingSituation | null
     phoneNumber?: StringNullableFilter<"CommunityMember"> | string | null
     serviceContactPerson?: StringNullableFilter<"CommunityMember"> | string | null
-    maritalStatus?: StringNullableFilter<"CommunityMember"> | string | null
+    maritalStatus?: EnumMaritalStatusNullableFilter<"CommunityMember"> | $Enums.MaritalStatus | null
     lastEducation?: EnumEducationLevelNullableFilter<"CommunityMember"> | $Enums.EducationLevel | null
     isStillStudying?: BoolNullableFilter<"CommunityMember"> | boolean | null
-    employmentStatus?: StringNullableFilter<"CommunityMember"> | string | null
+    employmentStatus?: EnumEmploymentStatusNullableFilter<"CommunityMember"> | $Enums.EmploymentStatus | null
+    jobDescription?: StringNullableFilter<"CommunityMember"> | string | null
     monthlyIncome?: StringNullableFilter<"CommunityMember"> | string | null
     hasOwnBusiness?: BoolNullableFilter<"CommunityMember"> | boolean | null
     hasReceivedSkillTraining?: BoolNullableFilter<"CommunityMember"> | boolean | null
@@ -2891,7 +2947,6 @@ export namespace Prisma {
     receivesSocialAssistance?: BoolNullableFilter<"CommunityMember"> | boolean | null
     isRegisteredInDTKS?: BoolNullableFilter<"CommunityMember"> | boolean | null
     communityGroup?: StringNullableFilter<"CommunityMember"> | string | null
-    notes?: StringNullableFilter<"CommunityMember"> | string | null
   }
 
   export type CommunityMemberOrderByWithRelationInput = {
@@ -2924,6 +2979,7 @@ export namespace Prisma {
     lastEducation?: SortOrderInput | SortOrder
     isStillStudying?: SortOrderInput | SortOrder
     employmentStatus?: SortOrderInput | SortOrder
+    jobDescription?: SortOrderInput | SortOrder
     monthlyIncome?: SortOrderInput | SortOrder
     hasOwnBusiness?: SortOrderInput | SortOrder
     hasReceivedSkillTraining?: SortOrderInput | SortOrder
@@ -2942,7 +2998,6 @@ export namespace Prisma {
     receivesSocialAssistance?: SortOrderInput | SortOrder
     isRegisteredInDTKS?: SortOrderInput | SortOrder
     communityGroup?: SortOrderInput | SortOrder
-    notes?: SortOrderInput | SortOrder
   }
 
   export type CommunityMemberWhereUniqueInput = Prisma.AtLeast<{
@@ -2975,10 +3030,11 @@ export namespace Prisma {
     livingSituation?: EnumLivingSituationNullableFilter<"CommunityMember"> | $Enums.LivingSituation | null
     phoneNumber?: StringNullableFilter<"CommunityMember"> | string | null
     serviceContactPerson?: StringNullableFilter<"CommunityMember"> | string | null
-    maritalStatus?: StringNullableFilter<"CommunityMember"> | string | null
+    maritalStatus?: EnumMaritalStatusNullableFilter<"CommunityMember"> | $Enums.MaritalStatus | null
     lastEducation?: EnumEducationLevelNullableFilter<"CommunityMember"> | $Enums.EducationLevel | null
     isStillStudying?: BoolNullableFilter<"CommunityMember"> | boolean | null
-    employmentStatus?: StringNullableFilter<"CommunityMember"> | string | null
+    employmentStatus?: EnumEmploymentStatusNullableFilter<"CommunityMember"> | $Enums.EmploymentStatus | null
+    jobDescription?: StringNullableFilter<"CommunityMember"> | string | null
     monthlyIncome?: StringNullableFilter<"CommunityMember"> | string | null
     hasOwnBusiness?: BoolNullableFilter<"CommunityMember"> | boolean | null
     hasReceivedSkillTraining?: BoolNullableFilter<"CommunityMember"> | boolean | null
@@ -2996,7 +3052,6 @@ export namespace Prisma {
     receivesSocialAssistance?: BoolNullableFilter<"CommunityMember"> | boolean | null
     isRegisteredInDTKS?: BoolNullableFilter<"CommunityMember"> | boolean | null
     communityGroup?: StringNullableFilter<"CommunityMember"> | string | null
-    notes?: StringNullableFilter<"CommunityMember"> | string | null
   }, "id" | "nik" | "bpjsId">
 
   export type CommunityMemberOrderByWithAggregationInput = {
@@ -3029,6 +3084,7 @@ export namespace Prisma {
     lastEducation?: SortOrderInput | SortOrder
     isStillStudying?: SortOrderInput | SortOrder
     employmentStatus?: SortOrderInput | SortOrder
+    jobDescription?: SortOrderInput | SortOrder
     monthlyIncome?: SortOrderInput | SortOrder
     hasOwnBusiness?: SortOrderInput | SortOrder
     hasReceivedSkillTraining?: SortOrderInput | SortOrder
@@ -3047,7 +3103,6 @@ export namespace Prisma {
     receivesSocialAssistance?: SortOrderInput | SortOrder
     isRegisteredInDTKS?: SortOrderInput | SortOrder
     communityGroup?: SortOrderInput | SortOrder
-    notes?: SortOrderInput | SortOrder
     _count?: CommunityMemberCountOrderByAggregateInput
     _avg?: CommunityMemberAvgOrderByAggregateInput
     _max?: CommunityMemberMaxOrderByAggregateInput
@@ -3084,10 +3139,11 @@ export namespace Prisma {
     livingSituation?: EnumLivingSituationNullableWithAggregatesFilter<"CommunityMember"> | $Enums.LivingSituation | null
     phoneNumber?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
     serviceContactPerson?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
-    maritalStatus?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
+    maritalStatus?: EnumMaritalStatusNullableWithAggregatesFilter<"CommunityMember"> | $Enums.MaritalStatus | null
     lastEducation?: EnumEducationLevelNullableWithAggregatesFilter<"CommunityMember"> | $Enums.EducationLevel | null
     isStillStudying?: BoolNullableWithAggregatesFilter<"CommunityMember"> | boolean | null
-    employmentStatus?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
+    employmentStatus?: EnumEmploymentStatusNullableWithAggregatesFilter<"CommunityMember"> | $Enums.EmploymentStatus | null
+    jobDescription?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
     monthlyIncome?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
     hasOwnBusiness?: BoolNullableWithAggregatesFilter<"CommunityMember"> | boolean | null
     hasReceivedSkillTraining?: BoolNullableWithAggregatesFilter<"CommunityMember"> | boolean | null
@@ -3106,7 +3162,6 @@ export namespace Prisma {
     receivesSocialAssistance?: BoolNullableWithAggregatesFilter<"CommunityMember"> | boolean | null
     isRegisteredInDTKS?: BoolNullableWithAggregatesFilter<"CommunityMember"> | boolean | null
     communityGroup?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
-    notes?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
   }
 
   export type CommunityMemberCreateInput = {
@@ -3135,10 +3190,11 @@ export namespace Prisma {
     livingSituation?: $Enums.LivingSituation | null
     phoneNumber?: string | null
     serviceContactPerson?: string | null
-    maritalStatus?: string | null
+    maritalStatus?: $Enums.MaritalStatus | null
     lastEducation?: $Enums.EducationLevel | null
     isStillStudying?: boolean | null
-    employmentStatus?: string | null
+    employmentStatus?: $Enums.EmploymentStatus | null
+    jobDescription?: string | null
     monthlyIncome?: string | null
     hasOwnBusiness?: boolean | null
     hasReceivedSkillTraining?: boolean | null
@@ -3157,7 +3213,6 @@ export namespace Prisma {
     receivesSocialAssistance?: boolean | null
     isRegisteredInDTKS?: boolean | null
     communityGroup?: string | null
-    notes?: string | null
   }
 
   export type CommunityMemberUncheckedCreateInput = {
@@ -3186,10 +3241,11 @@ export namespace Prisma {
     livingSituation?: $Enums.LivingSituation | null
     phoneNumber?: string | null
     serviceContactPerson?: string | null
-    maritalStatus?: string | null
+    maritalStatus?: $Enums.MaritalStatus | null
     lastEducation?: $Enums.EducationLevel | null
     isStillStudying?: boolean | null
-    employmentStatus?: string | null
+    employmentStatus?: $Enums.EmploymentStatus | null
+    jobDescription?: string | null
     monthlyIncome?: string | null
     hasOwnBusiness?: boolean | null
     hasReceivedSkillTraining?: boolean | null
@@ -3208,7 +3264,6 @@ export namespace Prisma {
     receivesSocialAssistance?: boolean | null
     isRegisteredInDTKS?: boolean | null
     communityGroup?: string | null
-    notes?: string | null
   }
 
   export type CommunityMemberUpdateInput = {
@@ -3237,10 +3292,11 @@ export namespace Prisma {
     livingSituation?: NullableEnumLivingSituationFieldUpdateOperationsInput | $Enums.LivingSituation | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     serviceContactPerson?: NullableStringFieldUpdateOperationsInput | string | null
-    maritalStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    maritalStatus?: NullableEnumMaritalStatusFieldUpdateOperationsInput | $Enums.MaritalStatus | null
     lastEducation?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
     isStillStudying?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    employmentStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentStatus?: NullableEnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus | null
+    jobDescription?: NullableStringFieldUpdateOperationsInput | string | null
     monthlyIncome?: NullableStringFieldUpdateOperationsInput | string | null
     hasOwnBusiness?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3259,7 +3315,6 @@ export namespace Prisma {
     receivesSocialAssistance?: NullableBoolFieldUpdateOperationsInput | boolean | null
     isRegisteredInDTKS?: NullableBoolFieldUpdateOperationsInput | boolean | null
     communityGroup?: NullableStringFieldUpdateOperationsInput | string | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CommunityMemberUncheckedUpdateInput = {
@@ -3288,10 +3343,11 @@ export namespace Prisma {
     livingSituation?: NullableEnumLivingSituationFieldUpdateOperationsInput | $Enums.LivingSituation | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     serviceContactPerson?: NullableStringFieldUpdateOperationsInput | string | null
-    maritalStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    maritalStatus?: NullableEnumMaritalStatusFieldUpdateOperationsInput | $Enums.MaritalStatus | null
     lastEducation?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
     isStillStudying?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    employmentStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentStatus?: NullableEnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus | null
+    jobDescription?: NullableStringFieldUpdateOperationsInput | string | null
     monthlyIncome?: NullableStringFieldUpdateOperationsInput | string | null
     hasOwnBusiness?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3310,7 +3366,6 @@ export namespace Prisma {
     receivesSocialAssistance?: NullableBoolFieldUpdateOperationsInput | boolean | null
     isRegisteredInDTKS?: NullableBoolFieldUpdateOperationsInput | boolean | null
     communityGroup?: NullableStringFieldUpdateOperationsInput | string | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CommunityMemberCreateManyInput = {
@@ -3339,10 +3394,11 @@ export namespace Prisma {
     livingSituation?: $Enums.LivingSituation | null
     phoneNumber?: string | null
     serviceContactPerson?: string | null
-    maritalStatus?: string | null
+    maritalStatus?: $Enums.MaritalStatus | null
     lastEducation?: $Enums.EducationLevel | null
     isStillStudying?: boolean | null
-    employmentStatus?: string | null
+    employmentStatus?: $Enums.EmploymentStatus | null
+    jobDescription?: string | null
     monthlyIncome?: string | null
     hasOwnBusiness?: boolean | null
     hasReceivedSkillTraining?: boolean | null
@@ -3361,7 +3417,6 @@ export namespace Prisma {
     receivesSocialAssistance?: boolean | null
     isRegisteredInDTKS?: boolean | null
     communityGroup?: string | null
-    notes?: string | null
   }
 
   export type CommunityMemberUpdateManyMutationInput = {
@@ -3390,10 +3445,11 @@ export namespace Prisma {
     livingSituation?: NullableEnumLivingSituationFieldUpdateOperationsInput | $Enums.LivingSituation | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     serviceContactPerson?: NullableStringFieldUpdateOperationsInput | string | null
-    maritalStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    maritalStatus?: NullableEnumMaritalStatusFieldUpdateOperationsInput | $Enums.MaritalStatus | null
     lastEducation?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
     isStillStudying?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    employmentStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentStatus?: NullableEnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus | null
+    jobDescription?: NullableStringFieldUpdateOperationsInput | string | null
     monthlyIncome?: NullableStringFieldUpdateOperationsInput | string | null
     hasOwnBusiness?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3412,7 +3468,6 @@ export namespace Prisma {
     receivesSocialAssistance?: NullableBoolFieldUpdateOperationsInput | boolean | null
     isRegisteredInDTKS?: NullableBoolFieldUpdateOperationsInput | boolean | null
     communityGroup?: NullableStringFieldUpdateOperationsInput | string | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CommunityMemberUncheckedUpdateManyInput = {
@@ -3441,10 +3496,11 @@ export namespace Prisma {
     livingSituation?: NullableEnumLivingSituationFieldUpdateOperationsInput | $Enums.LivingSituation | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     serviceContactPerson?: NullableStringFieldUpdateOperationsInput | string | null
-    maritalStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    maritalStatus?: NullableEnumMaritalStatusFieldUpdateOperationsInput | $Enums.MaritalStatus | null
     lastEducation?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
     isStillStudying?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    employmentStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    employmentStatus?: NullableEnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus | null
+    jobDescription?: NullableStringFieldUpdateOperationsInput | string | null
     monthlyIncome?: NullableStringFieldUpdateOperationsInput | string | null
     hasOwnBusiness?: NullableBoolFieldUpdateOperationsInput | boolean | null
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3463,7 +3519,6 @@ export namespace Prisma {
     receivesSocialAssistance?: NullableBoolFieldUpdateOperationsInput | boolean | null
     isRegisteredInDTKS?: NullableBoolFieldUpdateOperationsInput | boolean | null
     communityGroup?: NullableStringFieldUpdateOperationsInput | string | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -3564,6 +3619,13 @@ export namespace Prisma {
     not?: NestedEnumLivingSituationNullableFilter<$PrismaModel> | $Enums.LivingSituation | null
   }
 
+  export type EnumMaritalStatusNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.MaritalStatus | EnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumMaritalStatusNullableFilter<$PrismaModel> | $Enums.MaritalStatus | null
+  }
+
   export type EnumEducationLevelNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
     in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
@@ -3574,6 +3636,13 @@ export namespace Prisma {
   export type BoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
+  export type EnumEmploymentStatusNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmploymentStatus | EnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEmploymentStatusNullableFilter<$PrismaModel> | $Enums.EmploymentStatus | null
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -3630,6 +3699,7 @@ export namespace Prisma {
     lastEducation?: SortOrder
     isStillStudying?: SortOrder
     employmentStatus?: SortOrder
+    jobDescription?: SortOrder
     monthlyIncome?: SortOrder
     hasOwnBusiness?: SortOrder
     hasReceivedSkillTraining?: SortOrder
@@ -3648,7 +3718,6 @@ export namespace Prisma {
     receivesSocialAssistance?: SortOrder
     isRegisteredInDTKS?: SortOrder
     communityGroup?: SortOrder
-    notes?: SortOrder
   }
 
   export type CommunityMemberAvgOrderByAggregateInput = {
@@ -3685,6 +3754,7 @@ export namespace Prisma {
     lastEducation?: SortOrder
     isStillStudying?: SortOrder
     employmentStatus?: SortOrder
+    jobDescription?: SortOrder
     monthlyIncome?: SortOrder
     hasOwnBusiness?: SortOrder
     hasReceivedSkillTraining?: SortOrder
@@ -3703,7 +3773,6 @@ export namespace Prisma {
     receivesSocialAssistance?: SortOrder
     isRegisteredInDTKS?: SortOrder
     communityGroup?: SortOrder
-    notes?: SortOrder
   }
 
   export type CommunityMemberMinOrderByAggregateInput = {
@@ -3736,6 +3805,7 @@ export namespace Prisma {
     lastEducation?: SortOrder
     isStillStudying?: SortOrder
     employmentStatus?: SortOrder
+    jobDescription?: SortOrder
     monthlyIncome?: SortOrder
     hasOwnBusiness?: SortOrder
     hasReceivedSkillTraining?: SortOrder
@@ -3754,7 +3824,6 @@ export namespace Prisma {
     receivesSocialAssistance?: SortOrder
     isRegisteredInDTKS?: SortOrder
     communityGroup?: SortOrder
-    notes?: SortOrder
   }
 
   export type CommunityMemberSumOrderByAggregateInput = {
@@ -3891,6 +3960,16 @@ export namespace Prisma {
     _max?: NestedEnumLivingSituationNullableFilter<$PrismaModel>
   }
 
+  export type EnumMaritalStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MaritalStatus | EnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumMaritalStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.MaritalStatus | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumMaritalStatusNullableFilter<$PrismaModel>
+    _max?: NestedEnumMaritalStatusNullableFilter<$PrismaModel>
+  }
+
   export type EnumEducationLevelNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
     in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
@@ -3907,6 +3986,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedBoolNullableFilter<$PrismaModel>
     _max?: NestedBoolNullableFilter<$PrismaModel>
+  }
+
+  export type EnumEmploymentStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmploymentStatus | EnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEmploymentStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.EmploymentStatus | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumEmploymentStatusNullableFilter<$PrismaModel>
+    _max?: NestedEnumEmploymentStatusNullableFilter<$PrismaModel>
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -3981,12 +4070,20 @@ export namespace Prisma {
     set?: $Enums.LivingSituation | null
   }
 
+  export type NullableEnumMaritalStatusFieldUpdateOperationsInput = {
+    set?: $Enums.MaritalStatus | null
+  }
+
   export type NullableEnumEducationLevelFieldUpdateOperationsInput = {
     set?: $Enums.EducationLevel | null
   }
 
   export type NullableBoolFieldUpdateOperationsInput = {
     set?: boolean | null
+  }
+
+  export type NullableEnumEmploymentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.EmploymentStatus | null
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -4097,6 +4194,13 @@ export namespace Prisma {
     not?: NestedEnumLivingSituationNullableFilter<$PrismaModel> | $Enums.LivingSituation | null
   }
 
+  export type NestedEnumMaritalStatusNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.MaritalStatus | EnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumMaritalStatusNullableFilter<$PrismaModel> | $Enums.MaritalStatus | null
+  }
+
   export type NestedEnumEducationLevelNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
     in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
@@ -4107,6 +4211,13 @@ export namespace Prisma {
   export type NestedBoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
+  export type NestedEnumEmploymentStatusNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmploymentStatus | EnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEmploymentStatusNullableFilter<$PrismaModel> | $Enums.EmploymentStatus | null
   }
 
   export type NestedBoolFilter<$PrismaModel = never> = {
@@ -4278,6 +4389,16 @@ export namespace Prisma {
     _max?: NestedEnumLivingSituationNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumMaritalStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MaritalStatus | EnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.MaritalStatus[] | ListEnumMaritalStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumMaritalStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.MaritalStatus | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumMaritalStatusNullableFilter<$PrismaModel>
+    _max?: NestedEnumMaritalStatusNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumEducationLevelNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
     in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
@@ -4294,6 +4415,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedBoolNullableFilter<$PrismaModel>
     _max?: NestedBoolNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEmploymentStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmploymentStatus | EnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EmploymentStatus[] | ListEnumEmploymentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEmploymentStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.EmploymentStatus | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumEmploymentStatusNullableFilter<$PrismaModel>
+    _max?: NestedEnumEmploymentStatusNullableFilter<$PrismaModel>
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {

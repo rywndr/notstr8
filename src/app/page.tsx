@@ -56,7 +56,7 @@ export default async function Home() {
                   <p className={textStyle}><span className="font-semibold">Status Tempat Tinggal:</span> {member.livingSituation || '-'}</p>
 
                   <h4 className="text-lg font-semibold text-slate-700 mt-4 mb-1">Kontak:</h4>
-                  <p className={textStyle}><span className="font-semibold">No. Telepon Pribadi:</span> {member.phoneNumber || '-'}</p>
+                  <p className={textStyle}><span className="font-semibold">Kontak Yang Bisa Dihubungi:</span> {member.phoneNumber || '-'}</p>
                   <p className={textStyle}><span className="font-semibold">Kontak Layanan:</span> {member.serviceContactPerson || '-'}</p>
 
                   <h4 className="text-lg font-semibold text-slate-700 mt-4 mb-1">Status Sosial & Ekonomi:</h4>
@@ -97,7 +97,6 @@ export default async function Home() {
                   <p className={textStyle}><span className="font-semibold">Terdaftar DTKS:</span> {member.isRegisteredInDTKS === null ? '-' : member.isRegisteredInDTKS ? 'Ya' : 'Tidak'}</p>
                   <p className={textStyle}><span className="font-semibold">Kelompok Komunitas:</span> {member.communityGroup || '-'}</p>
                   
-                  {member.notes && <p className={textStyle}><span className="font-semibold">Catatan:</span> {member.notes}</p>}
                   <p className="text-xs text-slate-400 mt-4">Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}</p>
                 </div>
               ))}

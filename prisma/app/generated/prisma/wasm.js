@@ -150,6 +150,7 @@ exports.Prisma.CommunityMemberScalarFieldEnum = {
   lastEducation: 'lastEducation',
   isStillStudying: 'isStillStudying',
   employmentStatus: 'employmentStatus',
+  jobDescription: 'jobDescription',
   monthlyIncome: 'monthlyIncome',
   hasOwnBusiness: 'hasOwnBusiness',
   hasReceivedSkillTraining: 'hasReceivedSkillTraining',
@@ -167,8 +168,7 @@ exports.Prisma.CommunityMemberScalarFieldEnum = {
   wasDiscriminationReported: 'wasDiscriminationReported',
   receivesSocialAssistance: 'receivesSocialAssistance',
   isRegisteredInDTKS: 'isRegisteredInDTKS',
-  communityGroup: 'communityGroup',
-  notes: 'notes'
+  communityGroup: 'communityGroup'
 };
 
 exports.Prisma.SortOrder = {
@@ -212,12 +212,25 @@ exports.LivingSituation = exports.$Enums.LivingSituation = {
   SEWA_KONTRAK: 'SEWA_KONTRAK'
 };
 
+exports.MaritalStatus = exports.$Enums.MaritalStatus = {
+  BELUM_KAWIN: 'BELUM_KAWIN',
+  KAWIN: 'KAWIN',
+  CERAI: 'CERAI'
+};
+
 exports.EducationLevel = exports.$Enums.EducationLevel = {
   SD: 'SD',
   SMP: 'SMP',
   SMA_SMK: 'SMA_SMK',
   PERGURUAN_TINGGI: 'PERGURUAN_TINGGI',
   TIDAK_SEKOLAH: 'TIDAK_SEKOLAH'
+};
+
+exports.EmploymentStatus = exports.$Enums.EmploymentStatus = {
+  BEKERJA: 'BEKERJA',
+  TIDAK_BEKERJA: 'TIDAK_BEKERJA',
+  PELAJAR: 'PELAJAR',
+  MAHASISWA: 'MAHASISWA'
 };
 
 exports.HealthServiceAccess = exports.$Enums.HealthServiceAccess = {

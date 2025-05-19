@@ -11,7 +11,9 @@ import {
   EKTPStatus, 
   EducationLevel, 
   HealthServiceAccess, 
-  DiscriminationExperience 
+  DiscriminationExperience,
+  MaritalStatus,
+  EmploymentStatus
 } from '../../prisma/app/generated/prisma';
 
 // Type for form data (excluding id, createdAt, updatedAt which are auto-generated/managed)
@@ -41,10 +43,11 @@ export async function addCommunityMember(formData: FormData) {
       livingSituation: formData.get('livingSituation') as LivingSituation || null,
       phoneNumber: formData.get('phoneNumber') as string || null,
       serviceContactPerson: formData.get('serviceContactPerson') as string || null,
-      maritalStatus: formData.get('maritalStatus') as string || null,
+      maritalStatus: formData.get('maritalStatus') as MaritalStatus || null,
       lastEducation: formData.get('lastEducation') as EducationLevel || null,
       isStillStudying: formData.get('isStillStudying') === 'on',
-      employmentStatus: formData.get('employmentStatus') as string || null,
+      employmentStatus: formData.get('employmentStatus') as EmploymentStatus || null,
+      jobDescription: formData.get('jobDescription') as string || null,
       monthlyIncome: formData.get('monthlyIncome') as string || null,
       hasOwnBusiness: formData.get('hasOwnBusiness') === 'on',
       hasReceivedSkillTraining: formData.get('hasReceivedSkillTraining') === 'on',
@@ -62,7 +65,6 @@ export async function addCommunityMember(formData: FormData) {
       receivesSocialAssistance: formData.get('receivesSocialAssistance') === 'on',
       isRegisteredInDTKS: formData.get('isRegisteredInDTKS') === 'on',
       communityGroup: formData.get('communityGroup') as string || null,
-      notes: formData.get('notes') as string || null,
     };
 
     // --- Placeholder for File Handling ---

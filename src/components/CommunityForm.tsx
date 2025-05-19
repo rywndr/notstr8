@@ -1,12 +1,22 @@
 'use client';
 
-import { useRef, useState, FormEvent } from 'react';
+import { useRef, useState, FormEvent, ChangeEvent } from 'react';
 import { addCommunityMember } from '@/app/actions';
 
 export default function CommunityForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasBpjs, setHasBpjs] = useState(false);
+  const [hasDiscrimination, setHasDiscrimination] = useState(false);
+  const [hasReceivedTraining, setHasReceivedTraining] = useState(false);
+  const [employmentStatus, setEmploymentStatus] = useState("");
+  const [hasEktp, setHasEktp] = useState(false);
+
+  // handle digit-only input
+  const handleDigitInput = (e: ChangeEvent<HTMLInputElement>) => {
+    e.target.value = e.target.value.replace(/\D/g, ''); // rm any non-digit characters
+  };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,7 +83,13 @@ export default function CommunityForm() {
 
         <div className="mb-4">
           <label htmlFor="age" className={commonLabelStyle}>Usia</label>
-          <input type="number" name="age" id="age" className={commonInputStyle} />
+          <input 
+            type="text" 
+            name="age" 
+            id="age" 
+            className={`${commonInputStyle} [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`} 
+            onInput={handleDigitInput}
+          />
         </div>
 
         <div className="mb-4">
@@ -99,51 +115,80 @@ export default function CommunityForm() {
         <legend className="text-lg font-semibold text-slate-700 px-2">Data Kependudukan</legend>
         <div className="mb-4">
           <label htmlFor="nik" className={commonLabelStyle}>NIK (Nomor Induk Kependudukan)</label>
-          <input type="text" name="nik" id="nik" className={commonInputStyle} />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="idScanUrl" className={commonLabelStyle}>Pindaian KTP (Gambar)</label>
-          <input type="file" name="idScanUrl" id="idScanUrl" accept="image/*" className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`} />
+          <input 
+            type="text" 
+            name="nik" 
+            id="nik" 
+            className={commonInputStyle} 
+            placeholder="Contoh: 1234567890123456" 
+            maxLength={16} 
+            onInput={handleDigitInput}
+          />
         </div>
 
         <div className="mb-4">
           <label htmlFor="familyCardNumber" className={commonLabelStyle}>Nomor Kartu Keluarga (KK)</label>
-          <input type="text" name="familyCardNumber" id="familyCardNumber" className={commonInputStyle} />
+          <input 
+            type="text" 
+            name="familyCardNumber" 
+            id="familyCardNumber" 
+            className={commonInputStyle} 
+            placeholder="Contoh: 1234567890123456" 
+            maxLength={16} 
+            onInput={handleDigitInput}
+          />
         </div>
 
         <div className="mb-4">
           <label htmlFor="ektpStatus" className={commonLabelStyle}>Status Kepemilikan E-KTP</label>
-          <select name="ektpStatus" id="ektpStatus" className={commonInputStyle}>
+          <select 
+            name="ektpStatus" 
+            id="ektpStatus" 
+            className={commonInputStyle}
+            onChange={(e) => setHasEktp(e.target.value === "MEMILIKI")}
+          >
             <option value="">Pilih Status E-KTP</option>
             <option value="MEMILIKI">Memiliki</option>
             <option value="TIDAK_MEMILIKI">Tidak Memiliki</option>
             <option value="DALAM_PROSES">Dalam Proses</option>
           </select>
         </div>
+
+        <div className={`mb-4 ${!hasEktp ? 'opacity-50' : ''}`}>
+          <label htmlFor="idScanUrl" className={commonLabelStyle}>Pindaian KTP (Gambar)</label>
+          <input 
+            type="file" 
+            name="idScanUrl" 
+            id="idScanUrl" 
+            accept="image/*" 
+            className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`}
+            disabled={!hasEktp}
+          />
+        </div>
+
       </fieldset>
 
       <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
         <legend className="text-lg font-semibold text-slate-700 px-2">Alamat Domisili</legend>
         <div className="mb-4">
           <label htmlFor="address" className={commonLabelStyle}>Alamat Lengkap (Jalan, Nomor, RT/RW)</label>
-          <textarea name="address" id="address" rows={3} className={commonInputStyle}></textarea>
+          <textarea name="address" id="address" rows={3} className={commonInputStyle} placeholder="Contoh: Jl. Kuantan No. 123, RT 001/RW 002"></textarea>
         </div>
         <div className="mb-4">
           <label htmlFor="domicileKelurahan" className={commonLabelStyle}>Kelurahan Domisili</label>
-          <input type="text" name="domicileKelurahan" id="domicileKelurahan" className={commonInputStyle} />
+          <input type="text" name="domicileKelurahan" id="domicileKelurahan" className={commonInputStyle} placeholder="Contoh: Bukit Cermin" />
         </div>
         <div className="mb-4">
           <label htmlFor="domicileKecamatan" className={commonLabelStyle}>Kecamatan Domisili</label>
-          <input type="text" name="domicileKecamatan" id="domicileKecamatan" className={commonInputStyle} />
+          <input type="text" name="domicileKecamatan" id="domicileKecamatan" className={commonInputStyle} placeholder="Contoh: Bukit Bestari" />
         </div>
         <div className="mb-4">
           <label htmlFor="domicileRegencyCity" className={commonLabelStyle}>Kabupaten/Kota Domisili</label>
-          <input type="text" name="domicileRegencyCity" id="domicileRegencyCity" className={commonInputStyle} />
+          <input type="text" name="domicileRegencyCity" id="domicileRegencyCity" className={commonInputStyle} placeholder="Contoh: Kepulauan Riau/Kota Tanjungpinang" />
         </div>
          <div className="mb-4">
           <label htmlFor="city" className={commonLabelStyle}>Kota (Wajib, bisa sama dengan Kab/Kota Domisili)</label>
-          <input type="text" name="city" id="city" required className={commonInputStyle} />
+          <input type="text" name="city" id="city" required className={commonInputStyle} placeholder="Contoh: Tanjungpinang" />
         </div>
         <div className="mb-4">
           <label htmlFor="residencyStatus" className={commonLabelStyle}>Status Kependudukan</label>
@@ -167,12 +212,15 @@ export default function CommunityForm() {
       <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
         <legend className="text-lg font-semibold text-slate-700 px-2">Kontak</legend>
         <div className="mb-4">
-          <label htmlFor="phoneNumber" className={commonLabelStyle}>Nomor Telepon Pribadi</label>
-          <input type="tel" name="phoneNumber" id="phoneNumber" className={commonInputStyle} />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="serviceContactPerson" className={commonLabelStyle}>Kontak Layanan (Jika ada)</label>
-          <input type="text" name="serviceContactPerson" id="serviceContactPerson" className={commonInputStyle} />
+          <label htmlFor="phoneNumber" className={commonLabelStyle}>Kontak Yang Bisa Dihubungi</label>
+          <input 
+            type="tel" 
+            name="phoneNumber" 
+            id="phoneNumber" 
+            className={commonInputStyle} 
+            placeholder="Contoh: 081234567890" 
+            onInput={handleDigitInput}
+          />
         </div>
       </fieldset>
 
@@ -180,7 +228,12 @@ export default function CommunityForm() {
         <legend className="text-lg font-semibold text-slate-700 px-2">Status Sosial & Ekonomi</legend>
         <div className="mb-4">
           <label htmlFor="maritalStatus" className={commonLabelStyle}>Status Perkawinan</label>
-          <input type="text" name="maritalStatus" id="maritalStatus" className={commonInputStyle} placeholder="Contoh: Belum Kawin, Kawin, Cerai" />
+          <select name="maritalStatus" id="maritalStatus" className={commonInputStyle}>
+            <option value="">Pilih Status Perkawinan</option>
+            <option value="BELUM_KAWIN">Belum Kawin</option>
+            <option value="KAWIN">Kawin</option>
+            <option value="CERAI">Cerai</option>
+          </select>
         </div>
         <div className="mb-4">
           <label htmlFor="lastEducation" className={commonLabelStyle}>Pendidikan Terakhir</label>
@@ -199,11 +252,41 @@ export default function CommunityForm() {
         </div>
         <div className="mb-4">
           <label htmlFor="employmentStatus" className={commonLabelStyle}>Status Pekerjaan</label>
-          <input type="text" name="employmentStatus" id="employmentStatus" className={commonInputStyle} placeholder="Contoh: Bekerja, Tidak Bekerja, Pelajar" />
+          <select 
+            name="employmentStatus" 
+            id="employmentStatus" 
+            className={commonInputStyle}
+            onChange={(e) => setEmploymentStatus(e.target.value)}
+            value={employmentStatus}
+          >
+            <option value="">Pilih Status Pekerjaan</option>
+            <option value="BEKERJA">Bekerja</option>
+            <option value="TIDAK_BEKERJA">Tidak Bekerja</option>
+            <option value="PELAJAR">Pelajar</option>
+            <option value="MAHASISWA">Mahasiswa</option>
+          </select>
+        </div>
+        <div className={`mb-4 ${employmentStatus !== "BEKERJA" ? 'opacity-50' : ''}`}>
+          <label htmlFor="jobDescription" className={commonLabelStyle}>Jenis Pekerjaan</label>
+          <input 
+            type="text" 
+            name="jobDescription" 
+            id="jobDescription" 
+            className={commonInputStyle} 
+            placeholder="Contoh: Karyawan Swasta, Wirausaha, PNS"
+            disabled={employmentStatus !== "BEKERJA"}
+          />
         </div>
         <div className="mb-4">
           <label htmlFor="monthlyIncome" className={commonLabelStyle}>Pendapatan Bulanan</label>
-          <input type="text" name="monthlyIncome" id="monthlyIncome" className={commonInputStyle} placeholder="Contoh: 1.000.000 atau Rentang 1jt-2jt" />
+          <input 
+            type="text" 
+            name="monthlyIncome" 
+            id="monthlyIncome" 
+            className={commonInputStyle} 
+            placeholder="Contoh: 1000000" 
+            onInput={handleDigitInput}
+          />
         </div>
         <div className="flex items-center mt-2 mb-4">
           <input type="checkbox" name="hasOwnBusiness" id="hasOwnBusiness" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
@@ -214,32 +297,68 @@ export default function CommunityForm() {
       <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
         <legend className="text-lg font-semibold text-slate-700 px-2">Pelatihan</legend>
         <div className="flex items-center mt-2 mb-4">
-          <input type="checkbox" name="hasReceivedSkillTraining" id="hasReceivedSkillTraining" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+          <input 
+            type="checkbox" 
+            name="hasReceivedSkillTraining" 
+            id="hasReceivedSkillTraining" 
+            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            onChange={(e) => setHasReceivedTraining(e.target.checked)}
+            checked={hasReceivedTraining}
+          />
           <label htmlFor="hasReceivedSkillTraining" className="ml-2 block text-sm text-slate-900">Pernah Menerima Pelatihan Keterampilan Usaha?</label>
         </div>
-        <div className="mb-4">
+        <div className={`mb-4 ${!hasReceivedTraining ? 'opacity-50' : ''}`}>
           <label htmlFor="skillTrainingType" className={commonLabelStyle}>Jenis Pelatihan yang Pernah Diikuti</label>
-          <input type="text" name="skillTrainingType" id="skillTrainingType" className={commonInputStyle} />
+          <input 
+            type="text" 
+            name="skillTrainingType" 
+            id="skillTrainingType" 
+            className={commonInputStyle} 
+            disabled={!hasReceivedTraining}
+            placeholder="Contoh: Pelatihan Digital Marketing"
+          />
         </div>
         <div className="mb-4">
           <label htmlFor="desiredSkillTraining" className={commonLabelStyle}>Pelatihan yang Diinginkan</label>
-          <input type="text" name="desiredSkillTraining" id="desiredSkillTraining" className={commonInputStyle} />
+          <input type="text" name="desiredSkillTraining" id="desiredSkillTraining" className={commonInputStyle} placeholder="Contoh: Pelatihan Kewirausahaan" />
         </div>
       </fieldset>
 
       <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
         <legend className="text-lg font-semibold text-slate-700 px-2">Informasi BPJS</legend>
         <div className="flex items-center mb-4">
-          <input type="checkbox" name="hasBpjs" id="hasBpjs" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+          <input 
+            type="checkbox" 
+            name="hasBpjs" 
+            id="hasBpjs" 
+            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            onChange={(e) => setHasBpjs(e.target.checked)}
+            checked={hasBpjs}
+          />
           <label htmlFor="hasBpjs" className="ml-2 block text-sm text-slate-900">Apakah memiliki BPJS?</label>
         </div>
-        <div className="mb-4">
+        <div className={`mb-4 ${!hasBpjs ? 'opacity-50' : ''}`}>
           <label htmlFor="bpjsId" className={commonLabelStyle}>Nomor BPJS</label>
-          <input type="text" name="bpjsId" id="bpjsId" className={commonInputStyle} />
+          <input 
+            type="text" 
+            name="bpjsId" 
+            id="bpjsId" 
+            className={commonInputStyle} 
+            disabled={!hasBpjs} 
+            placeholder="Contoh: 0001234567890"
+            onInput={handleDigitInput}
+          />
         </div>
-        <div className="mb-4">
+        <div className={`mb-4 ${!hasBpjs ? 'opacity-50' : ''}`}>
           <label htmlFor="bpjsScanUrl" className={commonLabelStyle}>Pindaian Kartu BPJS (Gambar)</label>
-          <input type="file" name="bpjsScanUrl" id="bpjsScanUrl" accept="image/*" className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`} />
+          <input 
+            type="file" 
+            name="bpjsScanUrl" 
+            id="bpjsScanUrl" 
+            accept="image/*" 
+            className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`} 
+            disabled={!hasBpjs}
+          />
         </div>
       </fieldset>
 
@@ -265,26 +384,59 @@ export default function CommunityForm() {
         <legend className="text-lg font-semibold text-slate-700 px-2">Pengalaman Diskriminasi/Kekerasan</legend>
         <div className="mb-4">
           <label htmlFor="discriminationExperience" className={commonLabelStyle}>Pernah Mengalami Diskriminasi atau Kekerasan?</label>
-          <select name="discriminationExperience" id="discriminationExperience" className={commonInputStyle}>
+          <select 
+            name="discriminationExperience" 
+            id="discriminationExperience" 
+            className={commonInputStyle}
+            onChange={(e) => setHasDiscrimination(e.target.value === "PERNAH_MENGALAMI")}
+            value={hasDiscrimination ? "PERNAH_MENGALAMI" : ""}
+          >
             <option value="">Pilih Pengalaman</option>
             <option value="TIDAK_PERNAH">Tidak Pernah</option>
             <option value="PERNAH_MENGALAMI">Pernah Mengalami</option>
           </select>
         </div>
-        <div className="mb-4">
-          <label htmlFor="discriminationType" className={commonLabelStyle}>Jenis Diskriminasi/Kekerasan (Jika ada)</label>
-          <input type="text" name="discriminationType" id="discriminationType" className={commonInputStyle} />
+        <div className={`mb-4 ${!hasDiscrimination ? 'opacity-50' : ''}`}>
+          <label htmlFor="discriminationType" className={commonLabelStyle}>Jenis Diskriminasi/Kekerasan</label>
+          <input 
+            type="text" 
+            name="discriminationType" 
+            id="discriminationType" 
+            className={commonInputStyle} 
+            disabled={!hasDiscrimination}
+            placeholder="Contoh: Diskriminasi di tempat kerja"
+          />
         </div>
-        <div className="mb-4">
-          <label htmlFor="discriminationPerpetrator" className={commonLabelStyle}>Pelaku Diskriminasi/Kekerasan (Jika ada)</label>
-          <input type="text" name="discriminationPerpetrator" id="discriminationPerpetrator" className={commonInputStyle} />
+        <div className={`mb-4 ${!hasDiscrimination ? 'opacity-50' : ''}`}>
+          <label htmlFor="discriminationPerpetrator" className={commonLabelStyle}>Pelaku Diskriminasi/Kekerasan</label>
+          <input 
+            type="text" 
+            name="discriminationPerpetrator" 
+            id="discriminationPerpetrator" 
+            className={commonInputStyle} 
+            disabled={!hasDiscrimination}
+            placeholder="Contoh: Atasan, rekan kerja"
+          />
         </div>
-        <div className="mb-4">
-          <label htmlFor="discriminationLocation" className={commonLabelStyle}>Lokasi Kejadian (Jika ada)</label>
-          <input type="text" name="discriminationLocation" id="discriminationLocation" className={commonInputStyle} />
+        <div className={`mb-4 ${!hasDiscrimination ? 'opacity-50' : ''}`}>
+          <label htmlFor="discriminationLocation" className={commonLabelStyle}>Lokasi Kejadian</label>
+          <input 
+            type="text" 
+            name="discriminationLocation" 
+            id="discriminationLocation" 
+            className={commonInputStyle} 
+            disabled={!hasDiscrimination}
+            placeholder="Contoh: Kantor, sekolah, tempat umum"
+          />
         </div>
-        <div className="flex items-center mt-2 mb-4">
-          <input type="checkbox" name="wasDiscriminationReported" id="wasDiscriminationReported" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+        <div className={`flex items-center mt-2 mb-4 ${!hasDiscrimination ? 'opacity-50' : ''}`}>
+          <input 
+            type="checkbox" 
+            name="wasDiscriminationReported" 
+            id="wasDiscriminationReported" 
+            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            disabled={!hasDiscrimination}
+          />
           <label htmlFor="wasDiscriminationReported" className="ml-2 block text-sm text-slate-900">Apakah Diskriminasi/Kekerasan Telah Dilaporkan?</label>
         </div>
       </fieldset>
@@ -302,14 +454,6 @@ export default function CommunityForm() {
         <div className="mb-4">
           <label htmlFor="communityGroup" className={commonLabelStyle}>Kelompok Komunitas yang Diikuti</label>
           <input type="text" name="communityGroup" id="communityGroup" className={commonInputStyle} />
-        </div>
-      </fieldset>
-
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
-        <legend className="text-lg font-semibold text-slate-700 px-2">Catatan Tambahan</legend>
-        <div className="mb-4">
-          <label htmlFor="notes" className={commonLabelStyle}>Catatan Tambahan</label>
-          <textarea name="notes" id="notes" rows={3} className={commonInputStyle}></textarea>
         </div>
       </fieldset>
 
