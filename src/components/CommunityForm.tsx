@@ -12,6 +12,7 @@ export default function CommunityForm() {
   const [hasReceivedTraining, setHasReceivedTraining] = useState(false);
   const [employmentStatus, setEmploymentStatus] = useState("");
   const [hasEktp, setHasEktp] = useState(false);
+  const [hasOwnBusiness, setHasOwnBusiness] = useState(false);
 
   // handle digit-only input
   const handleDigitInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -289,8 +290,26 @@ export default function CommunityForm() {
           />
         </div>
         <div className="flex items-center mt-2 mb-4">
-          <input type="checkbox" name="hasOwnBusiness" id="hasOwnBusiness" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+          <input 
+            type="checkbox" 
+            name="hasOwnBusiness" 
+            id="hasOwnBusiness" 
+            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            onChange={(e) => setHasOwnBusiness(e.target.checked)}
+            checked={hasOwnBusiness}
+          />
           <label htmlFor="hasOwnBusiness" className="ml-2 block text-sm text-slate-900">Memiliki Usaha Sendiri?</label>
+        </div>
+        <div className={`mb-4 ${!hasOwnBusiness ? 'opacity-50' : ''}`}>
+          <label htmlFor="businessDetails" className={commonLabelStyle}>Detail Usaha</label>
+          <input 
+            type="text" 
+            name="businessDetails" 
+            id="businessDetails" 
+            className={commonInputStyle} 
+            placeholder="Contoh: Warung Makan, Toko Online, Jasa Jahit"
+            disabled={!hasOwnBusiness}
+          />
         </div>
       </fieldset>
 

@@ -50,6 +50,7 @@ export async function addCommunityMember(formData: FormData) {
       jobDescription: formData.get('jobDescription') as string || null,
       monthlyIncome: formData.get('monthlyIncome') as string || null,
       hasOwnBusiness: formData.get('hasOwnBusiness') === 'on',
+      businessDetails: formData.get('businessDetails') as string || null,
       hasReceivedSkillTraining: formData.get('hasReceivedSkillTraining') === 'on',
       skillTrainingType: formData.get('skillTrainingType') as string || null,
       desiredSkillTraining: formData.get('desiredSkillTraining') as string || null,

@@ -1060,6 +1060,7 @@ export namespace Prisma {
     hasReceivedSkillTraining: boolean | null
     skillTrainingType: string | null
     desiredSkillTraining: string | null
+    businessDetails: string | null
     hasBpjs: boolean | null
     bpjsId: string | null
     bpjsScanUrl: string | null
@@ -1111,6 +1112,7 @@ export namespace Prisma {
     hasReceivedSkillTraining: boolean | null
     skillTrainingType: string | null
     desiredSkillTraining: string | null
+    businessDetails: string | null
     hasBpjs: boolean | null
     bpjsId: string | null
     bpjsScanUrl: string | null
@@ -1162,6 +1164,7 @@ export namespace Prisma {
     hasReceivedSkillTraining: number
     skillTrainingType: number
     desiredSkillTraining: number
+    businessDetails: number
     hasBpjs: number
     bpjsId: number
     bpjsScanUrl: number
@@ -1223,6 +1226,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: true
     skillTrainingType?: true
     desiredSkillTraining?: true
+    businessDetails?: true
     hasBpjs?: true
     bpjsId?: true
     bpjsScanUrl?: true
@@ -1274,6 +1278,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: true
     skillTrainingType?: true
     desiredSkillTraining?: true
+    businessDetails?: true
     hasBpjs?: true
     bpjsId?: true
     bpjsScanUrl?: true
@@ -1325,6 +1330,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: true
     skillTrainingType?: true
     desiredSkillTraining?: true
+    businessDetails?: true
     hasBpjs?: true
     bpjsId?: true
     bpjsScanUrl?: true
@@ -1463,6 +1469,7 @@ export namespace Prisma {
     hasReceivedSkillTraining: boolean | null
     skillTrainingType: string | null
     desiredSkillTraining: string | null
+    businessDetails: string | null
     hasBpjs: boolean
     bpjsId: string | null
     bpjsScanUrl: string | null
@@ -1533,6 +1540,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: boolean
     skillTrainingType?: boolean
     desiredSkillTraining?: boolean
+    businessDetails?: boolean
     hasBpjs?: boolean
     bpjsId?: boolean
     bpjsScanUrl?: boolean
@@ -1584,6 +1592,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: boolean
     skillTrainingType?: boolean
     desiredSkillTraining?: boolean
+    businessDetails?: boolean
     hasBpjs?: boolean
     bpjsId?: boolean
     bpjsScanUrl?: boolean
@@ -1635,6 +1644,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: boolean
     skillTrainingType?: boolean
     desiredSkillTraining?: boolean
+    businessDetails?: boolean
     hasBpjs?: boolean
     bpjsId?: boolean
     bpjsScanUrl?: boolean
@@ -1686,6 +1696,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: boolean
     skillTrainingType?: boolean
     desiredSkillTraining?: boolean
+    businessDetails?: boolean
     hasBpjs?: boolean
     bpjsId?: boolean
     bpjsScanUrl?: boolean
@@ -1701,7 +1712,7 @@ export namespace Prisma {
     communityGroup?: boolean
   }
 
-  export type CommunityMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "middleName" | "lastName" | "communityNickname" | "placeOfBirth" | "dateOfBirth" | "age" | "gender" | "genderIdentity" | "nik" | "idScanUrl" | "familyCardNumber" | "ektpStatus" | "address" | "domicileKelurahan" | "domicileKecamatan" | "domicileRegencyCity" | "city" | "residencyStatus" | "livingSituation" | "phoneNumber" | "serviceContactPerson" | "maritalStatus" | "lastEducation" | "isStillStudying" | "employmentStatus" | "jobDescription" | "monthlyIncome" | "hasOwnBusiness" | "hasReceivedSkillTraining" | "skillTrainingType" | "desiredSkillTraining" | "hasBpjs" | "bpjsId" | "bpjsScanUrl" | "healthServiceAccess" | "chronicIllness" | "discriminationExperience" | "discriminationType" | "discriminationPerpetrator" | "discriminationLocation" | "wasDiscriminationReported" | "receivesSocialAssistance" | "isRegisteredInDTKS" | "communityGroup", ExtArgs["result"]["communityMember"]>
+  export type CommunityMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "middleName" | "lastName" | "communityNickname" | "placeOfBirth" | "dateOfBirth" | "age" | "gender" | "genderIdentity" | "nik" | "idScanUrl" | "familyCardNumber" | "ektpStatus" | "address" | "domicileKelurahan" | "domicileKecamatan" | "domicileRegencyCity" | "city" | "residencyStatus" | "livingSituation" | "phoneNumber" | "serviceContactPerson" | "maritalStatus" | "lastEducation" | "isStillStudying" | "employmentStatus" | "jobDescription" | "monthlyIncome" | "hasOwnBusiness" | "hasReceivedSkillTraining" | "skillTrainingType" | "desiredSkillTraining" | "businessDetails" | "hasBpjs" | "bpjsId" | "bpjsScanUrl" | "healthServiceAccess" | "chronicIllness" | "discriminationExperience" | "discriminationType" | "discriminationPerpetrator" | "discriminationLocation" | "wasDiscriminationReported" | "receivesSocialAssistance" | "isRegisteredInDTKS" | "communityGroup", ExtArgs["result"]["communityMember"]>
 
   export type $CommunityMemberPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "CommunityMember"
@@ -1742,6 +1753,7 @@ export namespace Prisma {
       hasReceivedSkillTraining: boolean | null
       skillTrainingType: string | null
       desiredSkillTraining: string | null
+      businessDetails: string | null
       hasBpjs: boolean
       bpjsId: string | null
       bpjsScanUrl: string | null
@@ -2213,6 +2225,7 @@ export namespace Prisma {
     readonly hasReceivedSkillTraining: FieldRef<"CommunityMember", 'Boolean'>
     readonly skillTrainingType: FieldRef<"CommunityMember", 'String'>
     readonly desiredSkillTraining: FieldRef<"CommunityMember", 'String'>
+    readonly businessDetails: FieldRef<"CommunityMember", 'String'>
     readonly hasBpjs: FieldRef<"CommunityMember", 'Boolean'>
     readonly bpjsId: FieldRef<"CommunityMember", 'String'>
     readonly bpjsScanUrl: FieldRef<"CommunityMember", 'String'>
@@ -2642,6 +2655,7 @@ export namespace Prisma {
     hasReceivedSkillTraining: 'hasReceivedSkillTraining',
     skillTrainingType: 'skillTrainingType',
     desiredSkillTraining: 'desiredSkillTraining',
+    businessDetails: 'businessDetails',
     hasBpjs: 'hasBpjs',
     bpjsId: 'bpjsId',
     bpjsScanUrl: 'bpjsScanUrl',
@@ -2934,6 +2948,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: BoolNullableFilter<"CommunityMember"> | boolean | null
     skillTrainingType?: StringNullableFilter<"CommunityMember"> | string | null
     desiredSkillTraining?: StringNullableFilter<"CommunityMember"> | string | null
+    businessDetails?: StringNullableFilter<"CommunityMember"> | string | null
     hasBpjs?: BoolFilter<"CommunityMember"> | boolean
     bpjsId?: StringNullableFilter<"CommunityMember"> | string | null
     bpjsScanUrl?: StringNullableFilter<"CommunityMember"> | string | null
@@ -2985,6 +3000,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: SortOrderInput | SortOrder
     skillTrainingType?: SortOrderInput | SortOrder
     desiredSkillTraining?: SortOrderInput | SortOrder
+    businessDetails?: SortOrderInput | SortOrder
     hasBpjs?: SortOrder
     bpjsId?: SortOrderInput | SortOrder
     bpjsScanUrl?: SortOrderInput | SortOrder
@@ -3040,6 +3056,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: BoolNullableFilter<"CommunityMember"> | boolean | null
     skillTrainingType?: StringNullableFilter<"CommunityMember"> | string | null
     desiredSkillTraining?: StringNullableFilter<"CommunityMember"> | string | null
+    businessDetails?: StringNullableFilter<"CommunityMember"> | string | null
     hasBpjs?: BoolFilter<"CommunityMember"> | boolean
     bpjsScanUrl?: StringNullableFilter<"CommunityMember"> | string | null
     healthServiceAccess?: EnumHealthServiceAccessNullableFilter<"CommunityMember"> | $Enums.HealthServiceAccess | null
@@ -3090,6 +3107,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: SortOrderInput | SortOrder
     skillTrainingType?: SortOrderInput | SortOrder
     desiredSkillTraining?: SortOrderInput | SortOrder
+    businessDetails?: SortOrderInput | SortOrder
     hasBpjs?: SortOrder
     bpjsId?: SortOrderInput | SortOrder
     bpjsScanUrl?: SortOrderInput | SortOrder
@@ -3149,6 +3167,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: BoolNullableWithAggregatesFilter<"CommunityMember"> | boolean | null
     skillTrainingType?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
     desiredSkillTraining?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
+    businessDetails?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
     hasBpjs?: BoolWithAggregatesFilter<"CommunityMember"> | boolean
     bpjsId?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
     bpjsScanUrl?: StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
@@ -3200,6 +3219,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: boolean | null
     skillTrainingType?: string | null
     desiredSkillTraining?: string | null
+    businessDetails?: string | null
     hasBpjs?: boolean
     bpjsId?: string | null
     bpjsScanUrl?: string | null
@@ -3251,6 +3271,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: boolean | null
     skillTrainingType?: string | null
     desiredSkillTraining?: string | null
+    businessDetails?: string | null
     hasBpjs?: boolean
     bpjsId?: string | null
     bpjsScanUrl?: string | null
@@ -3302,6 +3323,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
     skillTrainingType?: NullableStringFieldUpdateOperationsInput | string | null
     desiredSkillTraining?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDetails?: NullableStringFieldUpdateOperationsInput | string | null
     hasBpjs?: BoolFieldUpdateOperationsInput | boolean
     bpjsId?: NullableStringFieldUpdateOperationsInput | string | null
     bpjsScanUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3353,6 +3375,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
     skillTrainingType?: NullableStringFieldUpdateOperationsInput | string | null
     desiredSkillTraining?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDetails?: NullableStringFieldUpdateOperationsInput | string | null
     hasBpjs?: BoolFieldUpdateOperationsInput | boolean
     bpjsId?: NullableStringFieldUpdateOperationsInput | string | null
     bpjsScanUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3404,6 +3427,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: boolean | null
     skillTrainingType?: string | null
     desiredSkillTraining?: string | null
+    businessDetails?: string | null
     hasBpjs?: boolean
     bpjsId?: string | null
     bpjsScanUrl?: string | null
@@ -3455,6 +3479,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
     skillTrainingType?: NullableStringFieldUpdateOperationsInput | string | null
     desiredSkillTraining?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDetails?: NullableStringFieldUpdateOperationsInput | string | null
     hasBpjs?: BoolFieldUpdateOperationsInput | boolean
     bpjsId?: NullableStringFieldUpdateOperationsInput | string | null
     bpjsScanUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3506,6 +3531,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: NullableBoolFieldUpdateOperationsInput | boolean | null
     skillTrainingType?: NullableStringFieldUpdateOperationsInput | string | null
     desiredSkillTraining?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDetails?: NullableStringFieldUpdateOperationsInput | string | null
     hasBpjs?: BoolFieldUpdateOperationsInput | boolean
     bpjsId?: NullableStringFieldUpdateOperationsInput | string | null
     bpjsScanUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3705,6 +3731,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: SortOrder
     skillTrainingType?: SortOrder
     desiredSkillTraining?: SortOrder
+    businessDetails?: SortOrder
     hasBpjs?: SortOrder
     bpjsId?: SortOrder
     bpjsScanUrl?: SortOrder
@@ -3760,6 +3787,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: SortOrder
     skillTrainingType?: SortOrder
     desiredSkillTraining?: SortOrder
+    businessDetails?: SortOrder
     hasBpjs?: SortOrder
     bpjsId?: SortOrder
     bpjsScanUrl?: SortOrder
@@ -3811,6 +3839,7 @@ export namespace Prisma {
     hasReceivedSkillTraining?: SortOrder
     skillTrainingType?: SortOrder
     desiredSkillTraining?: SortOrder
+    businessDetails?: SortOrder
     hasBpjs?: SortOrder
     bpjsId?: SortOrder
     bpjsScanUrl?: SortOrder

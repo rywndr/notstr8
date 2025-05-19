@@ -64,8 +64,12 @@ export default async function Home() {
                   <p className={textStyle}><span className="font-semibold">Pendidikan Terakhir:</span> {member.lastEducation || '-'}</p>
                   <p className={textStyle}><span className="font-semibold">Masih Sekolah/Kuliah:</span> {member.isStillStudying === null ? '-' : member.isStillStudying ? 'Ya' : 'Tidak'}</p>
                   <p className={textStyle}><span className="font-semibold">Status Pekerjaan:</span> {member.employmentStatus || '-'}</p>
+                  <p className={textStyle}><span className="font-semibold">Jenis Pekerjaan:</span> {member.jobDescription || '-'}</p>
                   <p className={textStyle}><span className="font-semibold">Pendapatan Bulanan:</span> {member.monthlyIncome || '-'}</p>
                   <p className={textStyle}><span className="font-semibold">Kepemilikan Usaha:</span> {member.hasOwnBusiness === null ? '-' : member.hasOwnBusiness ? 'Ya' : 'Tidak'}</p>
+                  {member.hasOwnBusiness && member.businessDetails && (
+                    <p className={textStyle}><span className="font-semibold">Detail Usaha:</span> {member.businessDetails}</p>
+                  )}
                   
                   <h4 className="text-lg font-semibold text-slate-700 mt-4 mb-1">Pelatihan:</h4>
                   <p className={textStyle}><span className="font-semibold">Mendapatkan Pelatihan Keterampilan:</span> {member.hasReceivedSkillTraining === null ? '-' : member.hasReceivedSkillTraining ? 'Ya' : 'Tidak'}</p>

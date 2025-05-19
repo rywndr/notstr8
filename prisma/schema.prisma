@@ -122,6 +122,7 @@ model CommunityMember {
   hasReceivedSkillTraining Boolean? // Mendapatkan Pelatihan Keterampilan Usaha?
   skillTrainingType       String?   // Jenis Pelatihan yang Pernah Diikuti
   desiredSkillTraining    String?   // Pelatihan yang diinginkan
+  businessDetails         String?   // Detail usaha jika memiliki usaha sendiri
 
   // Informasi BPJS (BPJS Information)
   hasBpjs                 Boolean   @default(false) // Apakah memiliki BPJS?

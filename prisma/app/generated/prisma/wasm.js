@@ -156,6 +156,7 @@ exports.Prisma.CommunityMemberScalarFieldEnum = {
   hasReceivedSkillTraining: 'hasReceivedSkillTraining',
   skillTrainingType: 'skillTrainingType',
   desiredSkillTraining: 'desiredSkillTraining',
+  businessDetails: 'businessDetails',
   hasBpjs: 'hasBpjs',
   bpjsId: 'bpjsId',
   bpjsScanUrl: 'bpjsScanUrl',
