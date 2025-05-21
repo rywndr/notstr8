@@ -12,7 +12,7 @@ const Landing = () => {
             <HeartHandshake className="h-20 w-20 text-slate-700 mx-auto mb-6" />
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6">
-            Pendataan & Pemberdayaan Komunitas
+            Pendataan Komunitas
             <span className="block bg-gradient-to-r from-slate-600 to-slate-800 bg-clip-text text-transparent mt-2 pb-1.5">
               Waria Tanjungpinang
             </span>

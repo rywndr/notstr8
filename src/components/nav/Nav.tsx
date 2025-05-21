@@ -44,7 +44,7 @@ const Nav = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-neutral-200 rounded-b-xl shadow-lg">
+        <div className="md:hidden bg-neutral-100 rounded-b-xl shadow-lg">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link href="/" className="block text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300 transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold">
               Home
