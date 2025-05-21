@@ -25,6 +25,9 @@ const Nav = () => {
           <Link href="/dashboard" className="text-neutral-600 hover:text-neutral-900 transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-sm font-medium transform hover:scale-105">
             Dashboard
           </Link>
+          <Link href="/form" className="text-neutral-600 hover:text-neutral-900 transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-sm font-medium transform hover:scale-105">
+            Form
+          </Link>
         </div>
 
         {/* Mobile Menu Btn */}
@@ -48,6 +51,9 @@ const Nav = () => {
             </Link>
             <Link href="/dashboard" className="block text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300 transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-base font-medium">
               Dashboard
+            </Link>
+            <Link href="/form" className="block text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300 transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-base font-medium">
+              Form
             </Link>
           </div>
         </div>
