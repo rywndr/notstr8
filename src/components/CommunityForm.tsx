@@ -64,7 +64,7 @@ export default function CommunityForm() {
   const commonLabelStyle = "block text-sm font-medium text-slate-700 mb-1";
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 bg-slate-50 p-8 rounded-lg shadow-md w-full max-w-2xl">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 bg-slate-50 py-8 rounded-lg shadow-md w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <h2 className="text-2xl font-semibold text-slate-800 mb-6">Formulir Data Komunitas</h2>
 
       {message && <p className={`p-3 rounded-md ${message.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{message}</p>}
