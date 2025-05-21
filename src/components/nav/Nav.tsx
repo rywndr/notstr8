@@ -8,7 +8,7 @@ const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-neutral-200 shadow-xl rounded-xl my-4 max-w-7xl mx-4 sm:mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-neutral-100 shadow-xl rounded-xl my-4 max-w-7xl mx-4 sm:mx-auto px-4 sm:px-6 lg:px-8">
       <div className="py-3 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <Globe className="h-10 w-10 sm:h-12 sm:w-12 text-neutral-700 mr-2 sm:mr-3" />

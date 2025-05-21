@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'; // Ensure data is fetched on every reque
 export default async function FormPage() {
   const members = await getCommunityMembers();
 
-  const cardStyle = "bg-white shadow-lg rounded-lg p-6 mb-6 w-full max-w-2xl";
+  const cardStyle = "bg-slate-50 shadow-lg rounded-lg p-6 mb-6 w-full max-w-2xl";
   const headingStyle = "text-xl font-semibold text-slate-700 mb-2";
   const textStyle = "text-slate-600";
   const fileLinkStyle = "text-sky-600 hover:text-sky-800 underline";
