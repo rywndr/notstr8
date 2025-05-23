@@ -9,7 +9,7 @@ import { PageSizeSelector } from '@/components/admin/PageSizeSelector';
 export const dynamic = 'force-dynamic';
 
 interface AdminPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     pageSize?: string;
     search?: string;
@@ -17,7 +17,7 @@ interface AdminPageProps {
     social?: string;
     education?: string;
     employment?: string;
-  };
+  }>;
 }
 
 export default async function AdminPage({ searchParams }: AdminPageProps) {
