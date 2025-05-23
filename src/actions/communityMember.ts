@@ -72,28 +72,22 @@ export async function addCommunityMember(formData: FormData) {
       communityGroup: formData.get('communityGroup') as string || null,
     };
 
-    // --- Placeholder for File Handling ---
-    // In a real app, uploaded files needs to go to dedicated storage (e.g., S3, Cloudinary)
-    // and get back URLs to store in the database.
-    // For now, I'll just use placeholders if files are provided.
-
     const idScanFile = formData.get('idScanUrl') as File;
     if (formData.get('ektpStatus') === 'MEMILIKI' && idScanFile && idScanFile.size > 0) {
-      data.idScanUrl = `/uploads/id_scans/${Date.now()}_${idScanFile.name}`; // Placeholder URL
-      // TODO: Implement actual file upload logic for idScanFile
+      data.idScanUrl = `/uploads/id_scans/${Date.now()}_${idScanFile.name}`; 
+      // TODO: Handle file upload to server
     }
 
     const bpjsScanFile = formData.get('bpjsScanUrl') as File;
     if (formData.get('hasBpjs') === 'on' && bpjsScanFile && bpjsScanFile.size > 0) {
-      data.bpjsScanUrl = `/uploads/bpjs_scans/${Date.now()}_${bpjsScanFile.name}`; // Placeholder URL
-      // TODO: Implement actual file upload logic for bpjsScanFile
+      data.bpjsScanUrl = `/uploads/bpjs_scans/${Date.now()}_${bpjsScanFile.name}`; 
+      // TODO: Handle file upload to server
     }
 
     if (!data.firstName || !data.city) {
       return { error: 'Nama Depan dan Kota wajib diisi.' };
     }
     
-    // Validate phone number format if provided
     if (data.phoneNumber && !data.phoneNumber.startsWith('+628')) {
       return { error: 'Format nomor telepon tidak valid. Harus diawali dengan 8 setelah kode negara +62.' };
     }
@@ -102,7 +96,8 @@ export async function addCommunityMember(formData: FormData) {
       data: data as CommunityMemberFormData,
     });
 
-    revalidatePath('/'); // Revalidate the page to show the new entry
+    revalidatePath('/'); 
+    revalidatePath('/admin');
     return { success: 'Data berhasil ditambahkan.' };
   } catch (error) {
     console.error('Error adding community member:', error);
@@ -111,18 +106,65 @@ export async function addCommunityMember(formData: FormData) {
 }
 
 /**
- * Server action to get all community members
- * @returns Array of community members
+ * Server action to get community members with pagination and filtering
+ * @param page The current page number (1-indexed)
+ * @param pageSize The number of items per page
+ * @param searchQuery Optional search query for names, NIK, or KK
+ * @param bpjsStatus Optional filter for BPJS status ('true', 'false', or 'all')
+ * @param socialAssistanceStatus Optional filter for social assistance status ('true', 'false', or 'all')
+ * @returns Object with members for the current page and total count
  */
-export async function getCommunityMembers(): Promise<CommunityMember[]> {
+export async function getCommunityMembers(
+  page: number = 1,
+  pageSize: number = 10,
+  searchQuery?: string,
+  bpjsStatus?: string,
+  socialAssistanceStatus?: string
+): Promise<{ members: CommunityMember[]; totalCount: number; overallTotalCount: number }> {
   try {
-    return await prisma.communityMember.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+
+    const whereClause: any = {};
+
+    if (searchQuery) {
+      whereClause.OR = [
+        { firstName: { contains: searchQuery, mode: 'insensitive' } },
+        { middleName: { contains: searchQuery, mode: 'insensitive' } },
+        { lastName: { contains: searchQuery, mode: 'insensitive' } },
+        { nik: { contains: searchQuery, mode: 'insensitive' } },
+        { familyCardNumber: { contains: searchQuery, mode: 'insensitive' } },
+      ];
+    }
+
+    if (bpjsStatus === 'true') {
+      whereClause.hasBpjs = true;
+    } else if (bpjsStatus === 'false') {
+      whereClause.hasBpjs = false;
+    }
+
+    if (socialAssistanceStatus === 'true') {
+      whereClause.receivesSocialAssistance = true;
+    } else if (socialAssistanceStatus === 'false') {
+      whereClause.receivesSocialAssistance = false;
+    }
+
+    const [members, filteredTotalCount, overallTotalCount] = await prisma.$transaction([
+      prisma.communityMember.findMany({
+        where: whereClause,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip,
+        take,
+      }),
+      prisma.communityMember.count({ where: whereClause }),
+      prisma.communityMember.count(), // New count for overall total
+    ]);
+
+    return { members, totalCount: filteredTotalCount, overallTotalCount };
   } catch (error) {
     console.error('Error fetching community members:', error);
-    return [];
+    return { members: [], totalCount: 0, overallTotalCount: 0 };
   }
 }
