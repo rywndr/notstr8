@@ -16,7 +16,7 @@ const Nav = () => {
       <div className="py-3 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <span className="font-extrabold text-2xl sm:text-3xl text-neutral-800 hover:text-neutral-900 transition-colors">
-            DAKOMRi
+            DAKOMRI
           </span>
         </Link>
 
