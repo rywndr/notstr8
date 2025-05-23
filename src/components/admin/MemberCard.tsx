@@ -7,9 +7,11 @@ import {
   User, Phone, MapPin, Users,
   IdCard, TrendingUp, Award, Shield, Heart,
   AlertTriangle, HandHeart, Calendar, ExternalLink,
-  ChevronDown, ChevronUp, Briefcase, BookOpen
+  ChevronDown, ChevronUp, Briefcase, BookOpen,
+  Edit3, Trash2, MoreVertical
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { DeleteModal } from './DeleteModal';
 
 interface MemberCardProps {
   member: CommunityMember;
@@ -31,9 +33,10 @@ const styles = {
   statBadge: "px-2 py-1 rounded-md text-xs font-medium",
 };
 
-export function MemberCard({ member, index, currentPage, pageSize }: MemberCardProps) {
+export function MemberCard({ member}: MemberCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const memberNumber = (currentPage - 1) * pageSize + index + 1;
+  const [showActions, setShowActions] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
 
   const getBadgeColor = (type: string) => {
@@ -54,174 +57,224 @@ export function MemberCard({ member, index, currentPage, pageSize }: MemberCardP
   };
 
   return (
-    <div className={isExpanded ? styles.expandedCard : styles.card}>
-      {/* header w/ accent */}
-      <div className={`relative ${isExpanded ? 'mb-6' : 'mb-4'}`}>
-        {isExpanded ? (
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-500 rounded-t-xl"></div>
-        ) : (
-          <div className="absolute top-0 left-0 w-full h-1 bg-indigo-400 rounded-t-xl opacity-70"></div>
-        )}
-        <div className={`flex justify-between items-start ${isExpanded ? 'pt-4' : 'pt-3'}`}>
-          <div className="flex items-center gap-3">
-            <div className={`${styles.iconBox} bg-indigo-500`}>
-              <User size={18} />
+    <>
+      <div className={isExpanded ? styles.expandedCard : styles.card}>
+        {/* header w/ accent */}
+        <div className={`relative ${isExpanded ? 'mb-6' : 'mb-4'}`}>
+          {isExpanded ? (
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-500 rounded-t-xl"></div>
+          ) : (
+            <div className="absolute top-0 left-0 w-full h-1 bg-indigo-400 rounded-t-xl opacity-70"></div>
+          )}
+          <div className={`flex justify-between items-start ${isExpanded ? 'pt-4' : 'pt-3'}`}>
+            <div className="flex items-center gap-3">
+              <div className={`${styles.iconBox} bg-indigo-500`}>
+                <User size={18} />
+              </div>
+              <div>
+                <h3 className={isExpanded ? styles.expandedHeading : styles.heading}>{fullName}</h3>
+                {member.communityNickname && (
+                  <p className="text-indigo-600 text-sm font-medium">&quot;{member.communityNickname}&quot;</p>
+                )}
+              </div>
             </div>
-            <div>
-              <h3 className={isExpanded ? styles.expandedHeading : styles.heading}>{fullName}</h3>
-              {member.communityNickname && (
-                <p className="text-indigo-600 text-sm font-medium">&quot;{member.communityNickname}&quot;</p>
+            <div className="flex items-center gap-2">
+              
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className={styles.toggleBtn}
+              >
+                {isExpanded ? 'Tutup' : 'Detail'}
+                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              {/* action dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowActions(!showActions)}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <MoreVertical size={16} className="text-slate-600" />
+                </button>
+                
+                {showActions && (
+                  <div className="absolute right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                    <button
+                      onClick={() => {
+                        // navigate to edit page
+                        window.location.href = `/admin/edit/${member.id}`;
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 text-slate-700"
+                    >
+                      <Edit3 size={14} />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDeleteModal(true);
+                        setShowActions(false);
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 flex items-center gap-2 text-red-600"
+                    >
+                      <Trash2 size={14} />
+                      Hapus
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* basic preview when collapsed */}
+        {!isExpanded && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <Phone size={16} className="text-indigo-500" />
+                <span className="text-slate-700">{member.phoneNumber || '-'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin size={16} className="text-indigo-500" />
+                <span className="text-slate-700">{member.domicileRegencyCity || '-'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users size={16} className="text-indigo-500" />
+                <span className="text-slate-700">{member.communityGroup || '-'}</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mt-2">
+              {member.communityGroup && (
+                <span className={`${styles.statBadge} ${getBadgeColor('communityGroup')}`}>
+                  {member.communityGroup}
+                </span>
+              )}
+              {member.employmentStatus && (
+                <span className={`${styles.statBadge} ${getBadgeColor('employment')}`}>
+                  <Briefcase size={12} className="inline mr-1" />
+                  {member.employmentStatus}
+                </span>
+              )}
+              {member.isStillStudying != null && (
+                <span className={`${styles.statBadge} ${getBadgeColor('education')}`}>
+                  <BookOpen size={12} className="inline mr-1" />
+                  {member.isStillStudying ? 'Masih Bersekolah' : 'Tidak Bersekolah'}
+                </span>
+              )}
+              {member.age && (
+                <span className="px-2 py-1 rounded-md bg-indigo-100 text-indigo-800 text-xs font-medium">
+                  {member.age} Tahun
+                </span>
+              )}
+              {member.gender && (
+                <span className="px-2 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-medium">
+                  {member.gender}
+                </span>
               )}
             </div>
+            
+            <div className="border-t border-slate-200 pt-3 mt-3 text-sm grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <p className="text-slate-500 text-xs">Status Perkawinan</p>
+                <p className="font-medium text-slate-700">{member.maritalStatus || '-'}</p>
+              </div>
+              <div>
+                <p className="text-slate-500 text-xs">Pendidikan</p>
+                <p className="font-medium text-slate-700">{member.lastEducation || '-'}</p>
+              </div>
+              <div>
+                <p className="text-slate-500 text-xs">Status BPJS</p>
+                <p className={`font-medium ${member.hasBpjs ? 'text-green-600' : 'text-red-500'}`}>
+                  {member.hasBpjs ? 'Memiliki' : 'Tidak Memiliki'}
+                </p>
+              </div>
+              <div>
+                <p className="text-slate-500 text-xs">Bantuan Sosial</p>
+                <p className={`font-medium ${member.receivesSocialAssistance ? 'text-green-600' : 'text-slate-600'}`}>
+                  {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Menerima' : 'Tidak Menerima'}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className={styles.badge}>
-              #{memberNumber}
-            </span>
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className={styles.toggleBtn}
-            >
-              {isExpanded ? 'Tutup' : 'Detail'}
-              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-          </div>
-        </div>
+        )}
+
+        {/* expanded content */}
+        {isExpanded && (
+          <>
+            {/* basic info grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <InfoCard icon={User} title="Informasi Pribadi" color="bg-indigo-500">
+                <BasicInfo member={member} />
+              </InfoCard>
+              <InfoCard icon={Phone} title="Kontak & Status" color="bg-violet-500">
+                <ContactInfo member={member} />
+              </InfoCard>
+            </div>
+
+            {/* sections w/ icons */}
+            <div className="space-y-6">
+              <MemberSection title="Data Kependudukan" icon={IdCard}>
+                <PopulationData member={member} />
+              </MemberSection>
+
+              <MemberSection title="Alamat Domisili" icon={MapPin}>
+                <AddressData member={member} />
+              </MemberSection>
+
+              <MemberSection title="Status Sosial & Ekonomi" icon={TrendingUp}>
+                <SocialEconomicData member={member} />
+              </MemberSection>
+
+              <MemberSection title="Pelatihan" icon={Award}>
+                <TrainingData member={member} />
+              </MemberSection>
+
+              <MemberSection title="Informasi BPJS" icon={Shield}>
+                <BpjsData member={member} />
+              </MemberSection>
+
+              <MemberSection title="Data Kesehatan" icon={Heart}>
+                <HealthData member={member} />
+              </MemberSection>
+
+              <MemberSection title="Pengalaman Diskriminasi/Kekerasan" icon={AlertTriangle}>
+                <DiscriminationData member={member} />
+              </MemberSection>
+
+              <MemberSection title="Bantuan Sosial & Komunitas" icon={HandHeart}>
+                <SocialAssistanceData member={member} />
+              </MemberSection>
+            </div>
+
+            {/* footer */}
+            <div className="mt-8 pt-6 border-t border-slate-200 bg-indigo-50 -mx-8 -mb-8 px-8 pb-8 rounded-b-xl">
+              <div className="flex items-center gap-2 text-indigo-500">
+                <Calendar size={14} />
+                <p className="text-xs">
+                  Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* basic preview when collapsed */}
-      {!isExpanded && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Phone size={16} className="text-indigo-500" />
-              <span className="text-slate-700">{member.phoneNumber || '-'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin size={16} className="text-indigo-500" />
-              <span className="text-slate-700">{member.domicileRegencyCity || '-'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users size={16} className="text-indigo-500" />
-              <span className="text-slate-700">{member.communityGroup || '-'}</span>
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-2 mt-2">
-            {member.communityGroup && (
-              <span className={`${styles.statBadge} ${getBadgeColor('communityGroup')}`}>
-                {member.communityGroup}
-              </span>
-            )}
-            {member.employmentStatus && (
-              <span className={`${styles.statBadge} ${getBadgeColor('employment')}`}>
-                <Briefcase size={12} className="inline mr-1" />
-                {member.employmentStatus}
-              </span>
-            )}
-            {member.isStillStudying != null && (
-              <span className={`${styles.statBadge} ${getBadgeColor('education')}`}>
-                <BookOpen size={12} className="inline mr-1" />
-                {member.isStillStudying ? 'Masih Bersekolah' : 'Tidak Bersekolah'}
-              </span>
-            )}
-            {member.age && (
-              <span className="px-2 py-1 rounded-md bg-indigo-100 text-indigo-800 text-xs font-medium">
-                {member.age} Tahun
-              </span>
-            )}
-            {member.gender && (
-              <span className="px-2 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-medium">
-                {member.gender}
-              </span>
-            )}
-          </div>
-          
-          <div className="border-t border-slate-200 pt-3 mt-3 text-sm grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div>
-              <p className="text-slate-500 text-xs">Status Perkawinan</p>
-              <p className="font-medium text-slate-700">{member.maritalStatus || '-'}</p>
-            </div>
-            <div>
-              <p className="text-slate-500 text-xs">Pendidikan</p>
-              <p className="font-medium text-slate-700">{member.lastEducation || '-'}</p>
-            </div>
-            <div>
-              <p className="text-slate-500 text-xs">Status BPJS</p>
-              <p className={`font-medium ${member.hasBpjs ? 'text-green-600' : 'text-red-500'}`}>
-                {member.hasBpjs ? 'Memiliki' : 'Tidak Memiliki'}
-              </p>
-            </div>
-            <div>
-              <p className="text-slate-500 text-xs">Bantuan Sosial</p>
-              <p className={`font-medium ${member.receivesSocialAssistance ? 'text-green-600' : 'text-slate-600'}`}>
-                {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Menerima' : 'Tidak Menerima'}
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* delete modal */}
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        memberName={fullName}
+        memberId={member.id}
+      />
+
+      {/* click outside to close actions */}
+      {showActions && (
+        <div
+          className="fixed inset-0 z-0"
+          onClick={() => setShowActions(false)}
+        />
       )}
-
-      {/* expanded content */}
-      {isExpanded && (
-        <>
-          {/* basic info grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <InfoCard icon={User} title="Informasi Pribadi" color="bg-indigo-500">
-              <BasicInfo member={member} />
-            </InfoCard>
-            <InfoCard icon={Phone} title="Kontak & Status" color="bg-violet-500">
-              <ContactInfo member={member} />
-            </InfoCard>
-          </div>
-
-          {/* sections w/ icons */}
-          <div className="space-y-6">
-            <MemberSection title="Data Kependudukan" icon={IdCard}>
-              <PopulationData member={member} />
-            </MemberSection>
-
-            <MemberSection title="Alamat Domisili" icon={MapPin}>
-              <AddressData member={member} />
-            </MemberSection>
-
-            <MemberSection title="Status Sosial & Ekonomi" icon={TrendingUp}>
-              <SocialEconomicData member={member} />
-            </MemberSection>
-
-            <MemberSection title="Pelatihan" icon={Award}>
-              <TrainingData member={member} />
-            </MemberSection>
-
-            <MemberSection title="Informasi BPJS" icon={Shield}>
-              <BpjsData member={member} />
-            </MemberSection>
-
-            <MemberSection title="Data Kesehatan" icon={Heart}>
-              <HealthData member={member} />
-            </MemberSection>
-
-            <MemberSection title="Pengalaman Diskriminasi/Kekerasan" icon={AlertTriangle}>
-              <DiscriminationData member={member} />
-            </MemberSection>
-
-            <MemberSection title="Bantuan Sosial & Komunitas" icon={HandHeart}>
-              <SocialAssistanceData member={member} />
-            </MemberSection>
-          </div>
-
-          {/* footer */}
-          <div className="mt-8 pt-6 border-t border-slate-200 bg-indigo-50 -mx-8 -mb-8 px-8 pb-8 rounded-b-xl">
-            <div className="flex items-center gap-2 text-indigo-500">
-              <Calendar size={14} />
-              <p className="text-xs">
-                Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}
-              </p>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+    </>
   );
 }
 

@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { getCommunityMembers } from "@/actions" // Import server action
-import type { CommunityMember } from "../../../prisma/app/generated/prisma" // Import type
+import type { CommunityMember } from "../../../prisma/app/generated/prisma"
 import {
   Card,
   CardContent,
@@ -19,128 +18,176 @@ import {
   ChartTooltip,
 } from "@/components/ui/chart"
 
-const chartConfig = {
-  count: {
-    label: "Members",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig
+interface AreaChartInteractiveProps {
+  members: CommunityMember[];
+  title?: string;
+  description?: string;
+  dataKey?: keyof CommunityMember;
+  label?: string;
+  color?: string;
+}
 
-// Helper function to process fetched data
+// Define the ChartDataItem interface
+interface ChartDataItem {
+  age?: number;
+  category?: string;
+  count: number;
+  label: string;
+}
+
+// Helper function to process age data
 const processAgeData = (members: CommunityMember[]) => {
   const ageCounts: { [age: number]: number } = {}
+  
   members.forEach((member) => {
     if (member.age !== null && member.age !== undefined) {
       ageCounts[member.age] = (ageCounts[member.age] || 0) + 1
     }
   })
+  
   return Object.entries(ageCounts)
-    .map(([age, count]) => ({ age: parseInt(age, 10), count }))
-    .sort((a, b) => a.age - b.age) // Sort by age for the chart
+    .map(([age, count]) => ({ 
+      age: parseInt(age, 10), 
+      count,
+      label: `Age ${age}` 
+    }))
+    .sort((a, b) => a.age - b.age)
 }
 
-export function AreaChartInteractive() {
-  const [ageDistributionData, setAgeDistributionData] = React.useState<
-    { age: number; count: number }[]
-  >([])
-  const [loading, setLoading] = React.useState(true)
+// Helper function to process education data
+const processEducationData = (members: CommunityMember[]) => {
+  const educationCounts: { [education: string]: number } = {}
+  
+  members.forEach((member) => {
+    if (member.lastEducation) {
+      const education = member.lastEducation
+      educationCounts[education] = (educationCounts[education] || 0) + 1
+    }
+  })
+  
+  return Object.entries(educationCounts)
+    .map(([education, count]) => ({ 
+      category: education, 
+      count,
+      label: education.replace('_', ' ')
+    }))
+}
+
+// Helper function to process employment data
+const processEmploymentData = (members: CommunityMember[]) => {
+  const employmentCounts: { [employment: string]: number } = {}
+  
+  members.forEach((member) => {
+    if (member.employmentStatus) {
+      const employment = member.employmentStatus
+      employmentCounts[employment] = (employmentCounts[employment] || 0) + 1
+    }
+  })
+  
+  return Object.entries(employmentCounts)
+    .map(([employment, count]) => ({ 
+      category: employment, 
+      count,
+      label: employment.replace('_', ' ')
+    }))
+}
+
+export function AreaChartInteractive({
+  members,
+  title = "Age Distribution of Community Members",
+  description = "Showing the number of community members by age.",
+  dataKey = "age",
+  label = "Members",
+  color = "hsl(var(--chart-1))"
+}: AreaChartInteractiveProps) {
+  const [chartData, setChartData] = React.useState<ChartDataItem[]>([])
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const members = await getCommunityMembers()
-        const processedData = processAgeData(members)
-        setAgeDistributionData(processedData)
-      } catch (error) {
-        console.error("Failed to fetch or process community member data:", error)
-      }
-      setLoading(false)
+    let processedData: ChartDataItem[] = []
+    
+    switch (dataKey) {
+      case 'age':
+        processedData = processAgeData(members)
+        break
+      case 'lastEducation':
+        processedData = processEducationData(members)
+        break
+      case 'employmentStatus':
+        processedData = processEmploymentData(members)
+        break
+      default:
+        processedData = processAgeData(members)
     }
-    fetchData()
-  }, [])
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Age Distribution</CardTitle>
-          <CardDescription>Loading data...</CardDescription>
-        </CardHeader>
-        <CardContent className="flex h-[250px] items-center justify-center">
-          <p>Loading chart data...</p>
-        </CardContent>
-      </Card>
-    )
-  }
+    
+    setChartData(processedData)
+  }, [members, dataKey])
 
   // Calculate total members
-  const totalMembers = ageDistributionData.reduce(
-    (sum, item) => sum + item.count,
-    0
-  );
+  const totalMembers = chartData.reduce((sum, item) => sum + item.count, 0)
 
-  // Create dynamic chartConfig for legend
-  const currentChartConfig = {
-    ...chartConfig,
+  // Create dynamic chartConfig
+  const chartConfig = {
     count: {
-      ...chartConfig.count,
-      label: `Members: ${totalMembers}`, // Update label to include total count
+      label: `${label}: ${totalMembers}`,
+      color: color,
     },
-  };
+  } satisfies ChartConfig
+
+  // Determine the x-axis key based on data type
+  const xAxisKey = dataKey === 'age' ? 'age' : 'category'
 
   return (
     <Card>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b sm:flex-row">
         <div className="grid flex-1 text-center sm:text-left">
-          <CardTitle>Age Distribution of Community Members</CardTitle>
-          <CardDescription>
-            Showing the number of community members by age.
-          </CardDescription>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
-          config={currentChartConfig} // Use the updated chart config
+          config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={ageDistributionData}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillCount" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-count)"
+                  stopColor={color}
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-count)"
+                  stopColor={color}
                   stopOpacity={0.1}
                 />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="age" // X-axis represents age
+              dataKey={xAxisKey}
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={16}
-              tickFormatter={(value) => `${value}`}
+              tickFormatter={(value) => 
+                dataKey === 'age' ? `${value}` : value.replace('_', ' ')
+              }
             />
             <ChartTooltip
               cursor={false}
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
-                  const age = label; // X-axis value (age)
-                  const countData = payload.find(p => p.dataKey === 'count');
+                  const countData = payload.find(p => p.dataKey === 'count')
                   if (countData) {
-                    const countValue = countData.value;
-                    const color = countData.color || chartConfig.count.color;
+                    const countValue = countData.value
                     return (
                       <div className="rounded-lg border bg-background p-2 text-sm shadow-sm">
                         <div className="grid gap-1.5">
-                          <div className="font-medium text-foreground">Age: {age}</div>
+                          <div className="font-medium text-foreground">
+                            {dataKey === 'age' ? `Age: ${label}` : label?.toString().replace('_', ' ')}
+                          </div>
                           <div className="flex items-center text-muted-foreground">
                             <span
                               className="mr-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-[2px]"
@@ -150,18 +197,18 @@ export function AreaChartInteractive() {
                           </div>
                         </div>
                       </div>
-                    );
+                    )
                   }
                 }
-                return null;
+                return null
               }}
             />
             <Area
-              dataKey="count" // Data key for the number of members
+              dataKey="count"
               type="natural"
               fill="url(#fillCount)"
-              stroke="var(--color-count)"
-              stackId="a" // stackId can be kept or removed if only one Area
+              stroke={color}
+              stackId="a"
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>

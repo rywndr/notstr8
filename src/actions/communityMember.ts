@@ -15,6 +15,7 @@ import {
   MaritalStatus,
   EmploymentStatus
 } from '../../prisma/app/generated/prisma';
+import { Prisma } from '../../prisma/app/generated/prisma';
 
 // Type for form data (excluding id, createdAt, updatedAt which are auto-generated/managed)
 export type CommunityMemberFormData = Omit<CommunityMember, 'id' | 'createdAt' | 'updatedAt'>;
@@ -112,6 +113,8 @@ export async function addCommunityMember(formData: FormData) {
  * @param searchQuery Optional search query for names, NIK, or KK
  * @param bpjsStatus Optional filter for BPJS status ('true', 'false', or 'all')
  * @param socialAssistanceStatus Optional filter for social assistance status ('true', 'false', or 'all')
+ * @param educationLevel Optional filter for education level
+ * @param employmentStatus Optional filter for employment status
  * @returns Object with members for the current page and total count
  */
 export async function getCommunityMembers(
@@ -119,13 +122,15 @@ export async function getCommunityMembers(
   pageSize: number = 10,
   searchQuery?: string,
   bpjsStatus?: string,
-  socialAssistanceStatus?: string
+  socialAssistanceStatus?: string,
+  educationLevel?: string,
+  employmentStatus?: string
 ): Promise<{ members: CommunityMember[]; totalCount: number; overallTotalCount: number }> {
   try {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
-    const whereClause: any = {};
+    const whereClause: Prisma.CommunityMemberWhereInput = {};
 
     if (searchQuery) {
       whereClause.OR = [
@@ -134,6 +139,7 @@ export async function getCommunityMembers(
         { lastName: { contains: searchQuery, mode: 'insensitive' } },
         { nik: { contains: searchQuery, mode: 'insensitive' } },
         { familyCardNumber: { contains: searchQuery, mode: 'insensitive' } },
+        { communityNickname: { contains: searchQuery, mode: 'insensitive' } },
       ];
     }
 
@@ -149,6 +155,14 @@ export async function getCommunityMembers(
       whereClause.receivesSocialAssistance = false;
     }
 
+    if (educationLevel && educationLevel !== 'all') {
+      whereClause.lastEducation = educationLevel as EducationLevel;
+    }
+
+    if (employmentStatus && employmentStatus !== 'all') {
+      whereClause.employmentStatus = employmentStatus as EmploymentStatus;
+    }
+
     const [members, filteredTotalCount, overallTotalCount] = await prisma.$transaction([
       prisma.communityMember.findMany({
         where: whereClause,
@@ -159,12 +173,58 @@ export async function getCommunityMembers(
         take,
       }),
       prisma.communityMember.count({ where: whereClause }),
-      prisma.communityMember.count(), // New count for overall total
+      prisma.communityMember.count(),
     ]);
 
     return { members, totalCount: filteredTotalCount, overallTotalCount };
   } catch (error) {
     console.error('Error fetching community members:', error);
     return { members: [], totalCount: 0, overallTotalCount: 0 };
+  }
+}
+
+/**
+ * Server action to update a community member
+ * @param id Member ID to update
+ * @param data Updated member data
+ * @returns Object with success message or error
+ */
+export async function updateMember(id: string, data: Record<string, unknown>) {
+  try {
+    // Remove undefined and empty string values
+    const cleanData = Object.fromEntries(
+      Object.entries(data).filter(([value]) => {
+        if (value === undefined || value === null || value === '') return false;
+        if (typeof value === 'boolean') return true;
+        if (typeof value === 'number') return true;
+        return true;
+      })
+    );
+
+    // Process phone number format
+    if (cleanData.phoneNumber && !String(cleanData.phoneNumber).startsWith('+62')) {
+      cleanData.phoneNumber = `+62${cleanData.phoneNumber}`;
+    }
+
+    // Convert string numbers to actual numbers where needed
+    if (cleanData.age && typeof cleanData.age === 'string') {
+      cleanData.age = parseInt(cleanData.age, 10);
+    }
+
+    // Convert date strings to Date objects
+    if (cleanData.dateOfBirth && typeof cleanData.dateOfBirth === 'string') {
+      cleanData.dateOfBirth = new Date(cleanData.dateOfBirth);
+    }
+
+    await prisma.communityMember.update({
+      where: { id },
+      data: cleanData as Partial<CommunityMemberFormData>,
+    });
+
+    revalidatePath('/admin');
+    return { success: 'Data berhasil diperbarui.' };
+  } catch (error) {
+    console.error('Error updating community member:', error);
+    return { error: 'Gagal memperbarui data.' };
   }
 }

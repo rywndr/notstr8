@@ -3,7 +3,7 @@
 import * as React from "react"
 import { TrendingUp } from "lucide-react"
 import { Label, Pie, PieChart } from "recharts"
-
+import type { CommunityMember } from "../../../prisma/app/generated/prisma"
 import {
   Card,
   CardContent,
@@ -18,50 +18,162 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
-]
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig
+interface PieChartData {
+  category: string
+  visitors: number
+  fill: string
+}
 
-export function PieCh() {
+interface PieChProps {
+  members: CommunityMember[]
+  title?: string
+  description?: string
+  dataKey?: keyof CommunityMember
+}
+
+// Helper function to process gender data
+const processGenderData = (members: CommunityMember[]): PieChartData[] => {
+  const genderCounts: { [gender: string]: number } = {}
+
+  members.forEach((member) => {
+    if (member.gender) {
+      const gender = member.gender
+      genderCounts[gender] = (genderCounts[gender] || 0) + 1
+    }
+  })
+
+  return Object.entries(genderCounts).map(([gender, count]) => ({
+    category:
+      gender === "PRIA"
+        ? "Pria"
+        : gender === "WANITA"
+        ? "Wanita"
+        : gender,
+    visitors: count,
+    fill:
+      gender === "PRIA"
+        ? "hsl(var(--chart-1))"
+        : "hsl(var(--chart-2))",
+  }))
+}
+
+// Helper function to process BPJS data
+const processBpjsData = (members: CommunityMember[]): PieChartData[] => {
+  const bpjsCounts = { memiliki: 0, tidakMemiliki: 0 }
+
+  members.forEach((member) => {
+    if (member.hasBpjs) {
+      bpjsCounts.memiliki++
+    } else {
+      bpjsCounts.tidakMemiliki++
+    }
+  })
+
+  return [
+    {
+      category: "Memiliki",
+      visitors: bpjsCounts.memiliki,
+      fill: "hsl(var(--chart-1))",
+    },
+    {
+      category: "Tidak Memiliki",
+      visitors: bpjsCounts.tidakMemiliki,
+      fill: "hsl(var(--chart-2))",
+    },
+  ]
+}
+
+// Helper function to process marital status data
+const processMaritalStatusData = (members: CommunityMember[]): PieChartData[] => {
+  const maritalCounts: { [status: string]: number } = {}
+
+  members.forEach((member) => {
+    if (member.maritalStatus) {
+      const status = member.maritalStatus
+      maritalCounts[status] = (maritalCounts[status] || 0) + 1
+    }
+  })
+
+  const maritalLabels: { [key: string]: string } = {
+    BELUM_KAWIN: "Belum Kawin",
+    KAWIN: "Kawin",
+    CERAI: "Cerai",
+  }
+
+  const colors = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))"]
+
+  return Object.entries(maritalCounts).map(([status, count], index) => ({
+    category: maritalLabels[status] || status,
+    visitors: count,
+    fill: colors[index % colors.length],
+  }))
+}
+
+export function PieCh({
+  members,
+  title = "Grafik Lingkaran",
+  description = "Distribusi data anggota komunitas",
+  dataKey = "gender",
+}: PieChProps) {
+  const [chartData, setChartData] = React.useState<PieChartData[]>([])
+  const [chartConfig, setChartConfig] = React.useState<ChartConfig>({})
+
+  React.useEffect(() => {
+    let processedData: PieChartData[] = []
+    let config: ChartConfig = { visitors: { label: "Anggota" } }
+
+    switch (dataKey) {
+      case "gender":
+        processedData = processGenderData(members)
+        config = {
+          visitors: { label: "Anggota" },
+          pria: { label: "Pria", color: "hsl(var(--chart-1))" },
+          wanita: { label: "Wanita", color: "hsl(var(--chart-2))" },
+        }
+        break
+      case "hasBpjs":
+        processedData = processBpjsData(members)
+        config = {
+          visitors: { label: "Anggota" },
+          memiliki: { label: "Memiliki BPJS", color: "hsl(var(--chart-1))" },
+          "tidak-memiliki": {
+            label: "Tidak Memiliki BPJS",
+            color: "hsl(var(--chart-2))",
+          },
+        }
+        break
+      case "maritalStatus":
+        processedData = processMaritalStatusData(members)
+        config = {
+          visitors: { label: "Anggota" },
+          "belum-kawin": { label: "Belum Kawin", color: "hsl(var(--chart-1))" },
+          kawin: { label: "Kawin", color: "hsl(var(--chart-2))" },
+          cerai: { label: "Cerai", color: "hsl(var(--chart-3))" },
+        }
+        break
+      default:
+        processedData = processGenderData(members)
+        config = {
+          visitors: { label: "Anggota" },
+          pria: { label: "Pria", color: "hsl(var(--chart-1))" },
+          wanita: { label: "Wanita", color: "hsl(var(--chart-2))" },
+        }
+    }
+
+    setChartData(processedData)
+    setChartConfig(config)
+  }, [members, dataKey])
+
   const totalVisitors = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  }, [])
+  }, [chartData])
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Donut with Text</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -76,7 +188,7 @@ export function PieCh() {
             <Pie
               data={chartData}
               dataKey="visitors"
-              nameKey="browser"
+              nameKey="category"
               innerRadius={60}
               strokeWidth={5}
             >
@@ -102,7 +214,7 @@ export function PieCh() {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Anggota
                         </tspan>
                       </text>
                     )
@@ -115,10 +227,10 @@ export function PieCh() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          Data terkini anggota komunitas <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Menampilkan distribusi data anggota komunitas
         </div>
       </CardFooter>
     </Card>
