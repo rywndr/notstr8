@@ -2,31 +2,53 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Globe, Menu, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
 
 const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (path: string) => pathname === path;
 
   return (
     <nav className="bg-neutral-100 shadow-xl rounded-xl my-4 max-w-7xl mx-4 sm:mx-auto px-4 sm:px-6 lg:px-8">
       <div className="py-3 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          <Globe className="h-10 w-10 sm:h-12 sm:w-12 text-neutral-700 mr-2 sm:mr-3" />
           <span className="font-extrabold text-2xl sm:text-3xl text-neutral-800 hover:text-neutral-900 transition-colors">
-            notstr8
+            DAKOMRi
           </span>
         </Link>
 
         {/* Main Menu */}
         <div className="hidden md:flex items-center space-x-2">
-          <Link href="/" className="text-neutral-600 hover:text-neutral-900 transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105">
+          <Link href="/" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
+            isActive('/') 
+              ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
+              : 'text-neutral-600 hover:text-neutral-900'
+          }`}>
             Home
           </Link>
-          <Link href="/dashboard" className="text-neutral-600 hover:text-neutral-900 transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105">
+          <Link href="/dashboard" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
+            isActive('/dashboard') 
+              ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
+              : 'text-neutral-600 hover:text-neutral-900'
+          }`}>
             Dashboard
           </Link>
-          <Link href="/form" className="text-neutral-600 hover:text-neutral-900 transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105">
+          <Link href="/form" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
+            isActive('/form') 
+              ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
+              : 'text-neutral-600 hover:text-neutral-900'
+          }`}>
             Form
+          </Link>
+          <Link href="/admin" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
+            isActive('/admin') 
+              ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
+              : 'text-neutral-600 hover:text-neutral-900'
+          }`}>
+            Admin
           </Link>
         </div>
 
@@ -46,14 +68,33 @@ const Nav = () => {
       {isOpen && (
         <div className="md:hidden bg-neutral-100 rounded-b-xl shadow-lg">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/" className="block text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300 transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold">
+            <Link href="/" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
+              isActive('/') 
+                ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
+            }`}>
               Home
             </Link>
-            <Link href="/dashboard" className="block text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300 transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold">
+            <Link href="/dashboard" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
+              isActive('/dashboard') 
+                ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
+            }`}>
               Dashboard
             </Link>
-            <Link href="/form" className="block text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300 transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold">
+            <Link href="/form" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
+              isActive('/form') 
+                ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
+            }`}>
               Form
+            </Link>
+            <Link href="/admin" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
+              isActive('/admin') 
+                ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
+            }`}>
+              Members
             </Link>
           </div>
         </div>
