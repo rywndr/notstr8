@@ -1,30 +1,35 @@
 'use server';
 
-import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import prisma from '@/lib/prisma';
 
-export async function deleteMember(id: string) {
+interface DeleteMemberResult {
+  success?: string;
+  error?: string;
+}
+
+export async function deleteMember(id: string): Promise<DeleteMemberResult> {
   try {
     await prisma.communityMember.delete({
-      where: { id }
+      where: { id },
     });
+
     revalidatePath('/admin');
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: 'Failed to delete member' };
+    return { success: 'Data berhasil dihapus.' };
+  } catch (deleteError) {
+    console.error('Error deleting community member:', deleteError);
+    return { error: 'Gagal menghapus data.' };
   }
 }
 
-export async function updateMember(id: string, data: any) {
+export async function getMember(id: string) {
   try {
-    await prisma.communityMember.update({
+    const member = await prisma.communityMember.findUnique({
       where: { id },
-      data
     });
-    revalidatePath('/admin');
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: 'Failed to update member' };
+    return member;
+  } catch (fetchError) {
+    console.error('Error fetching community member:', fetchError);
+    return null;
   }
 }

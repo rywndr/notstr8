@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Users, HeartHandshake, ShieldCheck, ListChecks } from 'lucide-react';
 
 const Landing = () => {
@@ -96,10 +97,12 @@ const Landing = () => {
         <div className="container mx-auto px-6 max-w-4xl text-center">
           <h2 className="text-3xl font-bold mb-4 text-slate-800">Didukung Oleh</h2>
           <div className="flex flex-col items-center mb-6">
-            <img 
+            <Image 
               src="/stti-logo.png"
               alt="Logo Sekolah Tinggi Teknologi Indonesia Tanjung Pinang"
-              className="h-64 w-auto mb-4" 
+              width={256}
+              height={256}
+              className="mb-4" 
             />
             <p className="text-xl text-slate-700 font-semibold">
               Sekolah Tinggi Teknologi Indonesia Tanjung Pinang

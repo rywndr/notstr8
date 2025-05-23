@@ -25,7 +25,8 @@ export function DeleteModal({ isOpen, onClose, memberName, memberId }: DeleteMod
       } else {
         alert('gagal hapus member');
       }
-    } catch (error) {
+    } catch (deleteError) {
+      console.error('Error deleting member:', deleteError);
       alert('error occurred');
     } finally {
       setIsDeleting(false);
