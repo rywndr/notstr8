@@ -3,14 +3,16 @@ import { notFound } from 'next/navigation';
 import { EditMemberForm } from '@/components/admin/EditMemberForm';
 
 interface EditPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditMemberPage({ params }: EditPageProps) {
+  const { id } = await params;
+  
   const member = await prisma.communityMember.findUnique({
-    where: { id: params.id }
+    where: { id }
   });
 
   if (!member) {
