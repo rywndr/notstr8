@@ -4,12 +4,20 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import AuthButton from '../auth/AuthButton';
+import { useAuth } from '../../hooks/useAuth';
+import { MobileProfileSection } from './MobileProfileSection';
 
 const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const isActive = (path: string) => pathname === path;
+
+  const handleNavigate = () => {
+    setIsOpen(false);
+  };
 
   return (
     <nav className="bg-neutral-100 shadow-xl rounded-xl my-4 max-w-7xl mx-4 sm:mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,6 +37,7 @@ const Nav = () => {
           }`}>
             Home
           </Link>
+          
           <Link href="/dashboard" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
             isActive('/dashboard') 
               ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
@@ -36,6 +45,7 @@ const Nav = () => {
           }`}>
             Dashboard
           </Link>
+          
           <Link href="/form" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
             isActive('/form') 
               ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
@@ -43,13 +53,18 @@ const Nav = () => {
           }`}>
             Form
           </Link>
-          <Link href="/admin" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
-            isActive('/admin') 
-              ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
+          
+          {user?.role === 'ADMIN' && (
+            <Link href="/admin" className={`transition-all duration-300 ease-in-out px-3 py-2 rounded-md text-base font-semibold transform hover:scale-105 ${
+              isActive('/admin') 
+                ? 'text-slate-700 bg-slate-100 border-b-2 border-slate-700 shadow-sm' 
               : 'text-neutral-600 hover:text-neutral-900'
-          }`}>
-            Admin
-          </Link>
+            }`}>
+              Admin
+            </Link>
+          )}
+          
+          <AuthButton />
         </div>
 
         {/* Mobile Menu Btn */}
@@ -72,30 +87,44 @@ const Nav = () => {
               isActive('/') 
                 ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
-            }`}>
+            }`} onClick={handleNavigate}>
               Home
             </Link>
+            
             <Link href="/dashboard" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
               isActive('/dashboard') 
                 ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
-            }`}>
+            }`} onClick={handleNavigate}>
               Dashboard
             </Link>
+            
             <Link href="/form" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
               isActive('/form') 
                 ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
                 : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
-            }`}>
+            }`} onClick={handleNavigate}>
               Form
             </Link>
-            <Link href="/admin" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
-              isActive('/admin') 
-                ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
-                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
-            }`}>
-              Members
-            </Link>
+            
+            {user?.role === 'ADMIN' && (
+              <Link href="/admin" className={`block transition-all duration-200 ease-in-out px-3 py-2 rounded-md text-lg font-semibold ${
+                isActive('/admin') 
+                  ? 'text-slate-700 bg-slate-100 border-l-4 border-slate-700 shadow-sm' 
+                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-300'
+              }`} onClick={handleNavigate}>
+                Admin
+              </Link>
+            )}
+
+            {/* Mobile Auth Section */}
+            {user ? (
+              <MobileProfileSection user={user} onNavigate={handleNavigate} />
+            ) : (
+              <div className="px-3 py-2 border-t border-gray-200 mt-2">
+                <AuthButton />
+              </div>
+            )}
           </div>
         </div>
       )}

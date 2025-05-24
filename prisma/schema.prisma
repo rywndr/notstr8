@@ -74,6 +74,25 @@ enum EmploymentStatus {
   MAHASISWA
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(USER)
+  supabaseId String  @unique
+  hasSubmittedForm Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relationship to community member form submission
+  communityMember CommunityMember?
+}
+
 model CommunityMember {
   id              String    @id @default(cuid())
   createdAt       DateTime  @default(now())
@@ -144,4 +163,8 @@ model CommunityMember {
   receivesSocialAssistance  Boolean?  // Mendapatkan Bantuan sosial dari pemerintah?
   isRegisteredInDTKS      Boolean?  // Terdaftar dalam Data Terpadu Kesejahteraan Sosial (DTKS)?
   communityGroup          String?   // Kelompok Komunitas yang Diikuti
+
+  // Add user relationship
+  userId    String? @unique
+  user      User?   @relation(fields: [userId], references: [id])
 }

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { 
   CommunityMember, 
   Gender, 
@@ -26,7 +27,27 @@ export type CommunityMemberFormData = Omit<CommunityMember, 'id' | 'createdAt' |
  * @returns Object with success message or error
  */
 export async function addCommunityMember(formData: FormData) {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error || !user) {
+    return { error: 'Anda harus login terlebih dahulu.' }
+  }
+
   try {
+    // Check if user exists and hasn't submitted form
+    const dbUser = await prisma.user.findUnique({
+      where: { supabaseId: user.id }
+    })
+
+    if (!dbUser) {
+      return { error: 'User tidak ditemukan.' }
+    }
+
+    if (dbUser.hasSubmittedForm) {
+      return { error: 'Anda sudah pernah mengisi formulir.' }
+    }
+
     const data: Partial<CommunityMemberFormData> = {
       firstName: formData.get('firstName') as string,
       middleName: formData.get('middleName') as string || null,
@@ -93,12 +114,25 @@ export async function addCommunityMember(formData: FormData) {
       return { error: 'Format nomor telepon tidak valid. Harus diawali dengan 8 setelah kode negara +62.' };
     }
 
-    await prisma.communityMember.create({
-      data: data as CommunityMemberFormData,
-    });
+    // Create community member with user relationship
+    await prisma.$transaction(async (tx) => {
+      await tx.communityMember.create({
+        data: {
+          ...data as CommunityMemberFormData,
+          userId: dbUser.id
+        }
+      })
+
+      // Mark user as having submitted form
+      await tx.user.update({
+        where: { id: dbUser.id },
+        data: { hasSubmittedForm: true }
+      })
+    })
 
     revalidatePath('/'); 
     revalidatePath('/admin');
+    revalidatePath('/dashboard');
     return { success: 'Data berhasil ditambahkan.' };
   } catch (error) {
     console.error('Error adding community member:', error);
@@ -190,6 +224,31 @@ export async function getCommunityMembers(
  * @returns Object with success message or error
  */
 export async function updateMember(id: string, data: Record<string, unknown>) {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error || !user) {
+    return { error: 'Anda harus login terlebih dahulu.' }
+  }
+
+  // Check if user is admin or editing their own data
+  const dbUser = await prisma.user.findUnique({
+    where: { supabaseId: user.id },
+    include: { communityMember: true }
+  })
+
+  if (!dbUser) {
+    return { error: 'User tidak ditemukan.' }
+  }
+
+  // Allow if user is admin OR if user is editing their own submission
+  const isAdmin = dbUser.role === 'ADMIN'
+  const isOwnData = dbUser.communityMember?.id === id
+  
+  if (!isAdmin && !isOwnData) {
+    return { error: 'Anda tidak memiliki akses untuk mengubah data ini.' }
+  }
+
   try {
     // Remove undefined and empty string values
     const cleanData = Object.fromEntries(
@@ -222,9 +281,93 @@ export async function updateMember(id: string, data: Record<string, unknown>) {
     });
 
     revalidatePath('/admin');
+    revalidatePath('/form/edit');
     return { success: 'Data berhasil diperbarui.' };
   } catch (error) {
     console.error('Error updating community member:', error);
     return { error: 'Gagal memperbarui data.' };
+  }
+}
+
+/**
+ * Server action to get dashboard statistics
+ * @returns Object with total members and distribution data
+ */
+export async function getDashboardStats(): Promise<{
+  totalMembers: number;
+  ageDistribution: { age: number; count: number }[];
+  educationDistribution: { education: string; count: number }[];
+  employmentDistribution: { employment: string; count: number }[];
+  genderDistribution: { gender: string; count: number }[];
+}> {
+  try {
+    const members = await prisma.communityMember.findMany({
+      select: {
+        age: true,
+        lastEducation: true,
+        employmentStatus: true,
+        gender: true,
+      }
+    });
+
+    const totalMembers = members.length;
+
+    // Age distribution
+    const ageCounts: { [age: number]: number } = {};
+    members.forEach(member => {
+      if (member.age) {
+        ageCounts[member.age] = (ageCounts[member.age] || 0) + 1;
+      }
+    });
+    const ageDistribution = Object.entries(ageCounts)
+      .map(([age, count]) => ({ age: parseInt(age), count }))
+      .sort((a, b) => a.age - b.age);
+
+    // Education distribution
+    const educationCounts: { [education: string]: number } = {};
+    members.forEach(member => {
+      if (member.lastEducation) {
+        educationCounts[member.lastEducation] = (educationCounts[member.lastEducation] || 0) + 1;
+      }
+    });
+    const educationDistribution = Object.entries(educationCounts)
+      .map(([education, count]) => ({ education, count }));
+
+    // Employment distribution
+    const employmentCounts: { [employment: string]: number } = {};
+    members.forEach(member => {
+      if (member.employmentStatus) {
+        employmentCounts[member.employmentStatus] = (employmentCounts[member.employmentStatus] || 0) + 1;
+      }
+    });
+    const employmentDistribution = Object.entries(employmentCounts)
+      .map(([employment, count]) => ({ employment, count }));
+
+    // Gender distribution
+    const genderCounts: { [gender: string]: number } = {};
+    members.forEach(member => {
+      if (member.gender) {
+        genderCounts[member.gender] = (genderCounts[member.gender] || 0) + 1;
+      }
+    });
+    const genderDistribution = Object.entries(genderCounts)
+      .map(([gender, count]) => ({ gender, count }));
+
+    return {
+      totalMembers,
+      ageDistribution,
+      educationDistribution,
+      employmentDistribution,
+      genderDistribution
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    return {
+      totalMembers: 0,
+      ageDistribution: [],
+      educationDistribution: [],
+      employmentDistribution: [],
+      genderDistribution: []
+    };
   }
 }

@@ -27,7 +27,7 @@ interface AreaChartInteractiveProps {
   color?: string;
 }
 
-// Define the ChartDataItem interface
+// ChartDataItem interface
 interface ChartDataItem {
   age?: number;
   category?: string;
@@ -122,7 +122,7 @@ export function AreaChartInteractive({
     setChartData(processedData)
   }, [members, dataKey])
 
-  // Calculate total members
+  // Calc total members
   const totalMembers = chartData.reduce((sum, item) => sum + item.count, 0)
 
   // Create dynamic chartConfig
@@ -133,7 +133,7 @@ export function AreaChartInteractive({
     },
   } satisfies ChartConfig
 
-  // Determine the x-axis key based on data type
+  // Determine x-axis key based on data type
   const xAxisKey = dataKey === 'age' ? 'age' : 'category'
 
   return (

@@ -5,6 +5,12 @@ import { EmptyState } from '@/components/admin/EmptyState';
 import { AdminPagination } from '@/components/admin/AdminPagination';
 import { FilterControls } from '@/components/admin/FilterControls';
 import { PageSizeSelector } from '@/components/admin/PageSizeSelector';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Grid3x3, Table } from 'lucide-react';
+import { MemberTable } from '@/components/admin/MemberTable';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +27,24 @@ interface AdminPageProps {
 }
 
 export default async function AdminPage({ searchParams }: AdminPageProps) {
+  // Server-side auth check
+  const supabase = await createServerSupabaseClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  // Redirect if not authenticated
+  if (error || !user) {
+    redirect('/login');
+  }
+  
+  // Check if user is admin
+  const dbUser = await prisma.user.findUnique({
+    where: { supabaseId: user.id }
+  });
+  
+  if (!dbUser || dbUser.role !== 'ADMIN') {
+    redirect('/access-denied');
+  }
+
   const params = await searchParams;
   
   const currentPage = Number(params?.page) || 1;
@@ -43,10 +67,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   
   const totalPages = Math.ceil(totalCount / pageSize);
 
+  const hasFilters = searchQuery !== '' || bpjsStatus !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all';
+
   return (
     <div className="min-h-screen py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Header totalMembers={overallTotalCount} filteredCount={totalCount} />
+        <Header totalMembers={overallTotalCount} filteredCount={totalCount} hasFilters={hasFilters} />
         
         <FilterControls 
           initialSearchQuery={searchQuery}
@@ -56,28 +82,55 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           initialEmploymentStatus={employmentStatus}
         />
 
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-sm text-slate-600">
-            Menampilkan {members.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)} dari {totalCount} hasil
-          </div>
-          <PageSizeSelector currentPageSize={pageSize} />
-        </div>
-        
         <section className="w-full">
           {members.length === 0 ? (
             <EmptyState hasFilters={searchQuery !== '' || bpjsStatus !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all'} />
           ) : (
-            <div className="space-y-8">
-              {members.map((member, index) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  index={index}
-                  currentPage={currentPage}
-                  pageSize={pageSize}
-                />
-              ))}
-            </div>
+            <Tabs defaultValue="grid" className="w-full">
+              <div className="flex justify-between items-center mb-6">
+                <div className="text-sm text-slate-600">
+                  Menampilkan {members.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)} dari {totalCount} hasil
+                </div>
+                <div className="flex items-center gap-4">
+                  <TabsList>
+                    <TabsTrigger value="grid" className="flex items-center gap-2 transition-all duration-300 ease-in-out data-[state=active]:scale-105 data-[state=active]:shadow-md">
+                      <Grid3x3 className="w-4 h-4" />
+                      <span className="hidden sm:inline">Grid</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="table" className="flex items-center gap-2 transition-all duration-300 ease-in-out data-[state=active]:scale-105 data-[state=active]:shadow-md">
+                      <Table className="w-4 h-4" />
+                      <span className="hidden sm:inline">Table</span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <PageSizeSelector currentPageSize={pageSize} />
+                </div>
+              </div>
+              
+              <TabsContent value="grid" className="transition-all duration-500 ease-in-out animate-in fade-in-0 slide-in-from-bottom-2">
+                <div className="space-y-8">
+                  {members.map((member, index) => (
+                    <div 
+                      key={member.id}
+                      className="animate-in fade-in-0 slide-in-from-bottom-4"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <MemberCard
+                        member={member}
+                        index={index}
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="table" className="transition-all duration-500 ease-in-out animate-in fade-in-0 slide-in-from-bottom-2">
+                <div className="animate-in fade-in-0 slide-in-from-right-4 duration-500">
+                  <MemberTable members={members} />
+                </div>
+              </TabsContent>
+            </Tabs>
           )}
         </section>
 
@@ -93,7 +146,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   );
 }
 
-function Header({ totalMembers, filteredCount }: { totalMembers: number; filteredCount: number }) {
+function Header({ totalMembers, filteredCount, hasFilters }: { totalMembers: number; filteredCount: number; hasFilters: boolean }) {
   return (
     <div className="mb-10">
       <div className="flex items-center justify-center mb-6">
@@ -107,16 +160,23 @@ function Header({ totalMembers, filteredCount }: { totalMembers: number; filtere
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center"> 
-          <div>
+        {hasFilters ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center"> 
+            <div>
+              <h3 className="text-3xl font-bold text-slate-800">{totalMembers}</h3>
+              <p className="text-slate-600">Total Anggota Terdaftar</p>
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-blue-600">{filteredCount}</h3>
+              <p className="text-slate-600">Hasil Filter</p>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
             <h3 className="text-3xl font-bold text-slate-800">{totalMembers}</h3>
             <p className="text-slate-600">Total Anggota Terdaftar</p>
           </div>
-          <div>
-            <h3 className="text-3xl font-bold text-blue-600">{filteredCount}</h3>
-            <p className="text-slate-600">Hasil Filter</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

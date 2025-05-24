@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Trash2, AlertTriangle, X } from 'lucide-react';
 import { deleteMember } from '@/actions/member-actions';
+import { toast } from 'sonner';
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -13,29 +15,47 @@ interface DeleteModalProps {
 
 export function DeleteModal({ isOpen, onClose, memberName, memberId }: DeleteModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
       const result = await deleteMember(memberId);
       if (result.success) {
+        toast.success('Member berhasil dihapus!', {
+          description: 'Data member telah dihapus dari database.',
+        });
         onClose();
       } else {
-        alert('gagal hapus member');
+        toast.error('Gagal menghapus member', {
+          description: result.error || 'Terjadi kesalahan saat menghapus data.',
+        });
       }
     } catch (deleteError) {
       console.error('Error deleting member:', deleteError);
-      alert('error occurred');
+      toast.error('Terjadi kesalahan', {
+        description: 'Tidak dapat menghapus member. Silakan coba lagi.',
+      });
     } finally {
       setIsDeleting(false);
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+  const modalContent = (
+    <div
+      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -87,4 +107,6 @@ export function DeleteModal({ isOpen, onClose, memberName, memberId }: DeleteMod
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

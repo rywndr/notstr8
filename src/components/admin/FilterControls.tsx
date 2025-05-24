@@ -1,15 +1,15 @@
-'use client';
+'use client'
 
-import { useState, useRef, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, Filter, X } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Search, Filter, X, Tag } from 'lucide-react'
 
 interface FilterControlsProps {
-  initialSearchQuery: string;
-  initialBpjsStatus: string;
-  initialSocialAssistanceStatus: string;
-  initialEducationLevel: string;
-  initialEmploymentStatus: string;
+  initialSearchQuery: string
+  initialBpjsStatus: string
+  initialSocialAssistanceStatus: string
+  initialEducationLevel: string
+  initialEmploymentStatus: string
 }
 
 export function FilterControls({
@@ -19,211 +19,243 @@ export function FilterControls({
   initialEducationLevel,
   initialEmploymentStatus
 }: FilterControlsProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+  const [bpjsStatus, setBpjsStatus] = useState(initialBpjsStatus)
+  const [socialAssistanceStatus, setSocialAssistanceStatus] = useState(initialSocialAssistanceStatus)
+  const [educationLevel, setEducationLevel] = useState(initialEducationLevel)
+  const [employmentStatus, setEmploymentStatus] = useState(initialEmploymentStatus)
 
-  // Close dropdown when clicking outside
+  // Auto-apply filters when values change
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (openDropdown && dropdownRefs.current[openDropdown]) {
-        if (!dropdownRefs.current[openDropdown]?.contains(event.target as Node)) {
-          setOpenDropdown(null);
+    const timeoutId = setTimeout(() => {
+      applyFilters()
+    }, 300) // Debounce search input
+
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, bpjsStatus, socialAssistanceStatus, educationLevel, employmentStatus])
+
+  const applyFilters = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    
+    if (searchQuery) {
+      params.set('search', searchQuery)
+    } else {
+      params.delete('search')
+    }
+    
+    if (bpjsStatus !== 'all') {
+      params.set('bpjs', bpjsStatus)
+    } else {
+      params.delete('bpjs')
+    }
+    
+    if (socialAssistanceStatus !== 'all') {
+      params.set('social', socialAssistanceStatus)
+    } else {
+      params.delete('social')
+    }
+    
+    if (educationLevel !== 'all') {
+      params.set('education', educationLevel)
+    } else {
+      params.delete('education')
+    }
+    
+    if (employmentStatus !== 'all') {
+      params.set('employment', employmentStatus)
+    } else {
+      params.delete('employment')
+    }
+    
+    params.set('page', '1') // Reset to first page
+    router.push(`/admin?${params.toString()}`)
+  }
+
+  const clearSearch = () => {
+    setSearchQuery('')
+  }
+
+  const clearDropdownFilters = () => {
+    setBpjsStatus('all')
+    setSocialAssistanceStatus('all')
+    setEducationLevel('all')
+    setEmploymentStatus('all')
+  }
+
+  const hasActiveDropdownFilters = bpjsStatus !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all'
+
+  const getFilterLabel = (type: string, value: string) => {
+    switch (type) {
+      case 'bpjs':
+        return value === 'true' ? 'Memiliki BPJS' : 'Tidak Memiliki BPJS'
+      case 'social':
+        return value === 'true' ? 'Menerima Bantuan' : 'Tidak Menerima Bantuan'
+      case 'education':
+        const educationLabels: { [key: string]: string } = {
+          'SD': 'SD',
+          'SMP': 'SMP',
+          'SMA_SMK': 'SMA/SMK',
+          'PERGURUAN_TINGGI': 'Perguruan Tinggi',
+          'TIDAK_SEKOLAH': 'Tidak Sekolah'
         }
-      }
+        return educationLabels[value] || value
+      case 'employment':
+        const employmentLabels: { [key: string]: string } = {
+          'BEKERJA': 'Bekerja',
+          'TIDAK_BEKERJA': 'Tidak Bekerja',
+          'PELAJAR': 'Pelajar',
+          'MAHASISWA': 'Mahasiswa'
+        }
+        return employmentLabels[value] || value
+      default:
+        return value
     }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [openDropdown]);
-
-  // Close dropdown on scroll
-  useEffect(() => {
-    function handleScroll() {
-      setOpenDropdown(null);
-    }
-
-    if (openDropdown) {
-      document.addEventListener('scroll', handleScroll, true);
-      return () => document.removeEventListener('scroll', handleScroll, true);
-    }
-  }, [openDropdown]);
-
-  const updateFilters = (newFilters: Record<string, string>) => {
-    const params = new URLSearchParams(searchParams);
-    
-    Object.entries(newFilters).forEach(([key, value]) => {
-      if (value && value !== 'all' && value !== '') {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    });
-    
-    // Reset to page 1 when filters change
-    params.delete('page');
-    
-    router.push(`/admin?${params.toString()}`);
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateFilters({ search: searchQuery });
-  };
-
-  const handleFilterChange = (filterType: string, value: string) => {
-    updateFilters({ [filterType]: value });
-    setOpenDropdown(null);
-  };
-
-  const clearAllFilters = () => {
-    setSearchQuery('');
-    router.push('/admin');
-  };
-
-  const hasActiveFilters = initialSearchQuery !== '' || 
-    initialBpjsStatus !== 'all' || 
-    initialSocialAssistanceStatus !== 'all' || 
-    initialEducationLevel !== 'all' || 
-    initialEmploymentStatus !== 'all';
-
-  const DropdownButton = ({ 
-    label, 
-    value, 
-    options, 
-    filterKey 
-  }: { 
-    label: string; 
-    value: string; 
-    options: { value: string; label: string }[]; 
-    filterKey: string; 
-  }) => (
-    <div className="relative" ref={el => { dropdownRefs.current[filterKey] = el; }}>
-      <button
-        type="button"
-        onClick={() => setOpenDropdown(openDropdown === filterKey ? null : filterKey)}
-        className={`inline-flex items-center px-4 py-2 border border-slate-300 rounded-md shadow-sm bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
-          value !== 'all' ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : ''
-        }`}
-      >
-        {label}: {options.find(opt => opt.value === value)?.label || 'Semua'}
-        <svg className="ml-2 -mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {openDropdown === filterKey && (
-        <div className="absolute z-10 mt-1 w-56 bg-white border border-slate-200 rounded-md shadow-lg">
-          <div className="py-1 max-h-60 overflow-y-auto">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleFilterChange(filterKey, option.value)}
-                className={`block w-full text-left px-4 py-2 text-sm hover:bg-slate-100 ${
-                  value === option.value ? 'bg-indigo-50 text-indigo-700' : 'text-slate-700'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      <div className="flex items-center gap-4 mb-4">
-        <Filter className="h-5 w-5 text-slate-600" />
-        <h3 className="text-lg font-medium text-slate-800">Filter & Pencarian</h3>
-        {hasActiveFilters && (
-          <button
-            onClick={clearAllFilters}
-            className="inline-flex items-center text-sm text-red-600 hover:text-red-700"
-          >
-            <X className="h-4 w-4 mr-1" />
-            Hapus Semua Filter
-          </button>
-        )}
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="flex items-center gap-3 mb-4">
+        <Filter className="w-5 h-5 text-slate-600" />
+        <h3 className="text-lg font-semibold text-slate-800">Filter & Pencarian</h3>
       </div>
-
+      
       <div className="space-y-4">
-        {/* Search */}
-        <form onSubmit={handleSearchSubmit} className="flex gap-2">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Cari nama, NIK, atau KK..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Cari
-          </button>
-        </form>
+        {/* Search Input */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Cari nama, NIK, atau KK..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
 
         {/* Filter Dropdowns */}
-        <div className="flex flex-wrap gap-3">
-          <DropdownButton
-            label="BPJS"
-            value={initialBpjsStatus}
-            filterKey="bpjs"
-            options={[
-              { value: 'all', label: 'Semua' },
-              { value: 'true', label: 'Memiliki' },
-              { value: 'false', label: 'Tidak Memiliki' }
-            ]}
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status BPJS</label>
+            <select
+              value={bpjsStatus}
+              onChange={(e) => setBpjsStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm"
+            >
+              <option value="all">Semua</option>
+              <option value="true">Memiliki BPJS</option>
+              <option value="false">Tidak Memiliki BPJS</option>
+            </select>
+          </div>
 
-          <DropdownButton
-            label="Bantuan Sosial"
-            value={initialSocialAssistanceStatus}
-            filterKey="social"
-            options={[
-              { value: 'all', label: 'Semua' },
-              { value: 'true', label: 'Menerima' },
-              { value: 'false', label: 'Tidak Menerima' }
-            ]}
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Bantuan Sosial</label>
+            <select
+              value={socialAssistanceStatus}
+              onChange={(e) => setSocialAssistanceStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm"
+            >
+              <option value="all">Semua</option>
+              <option value="true">Menerima</option>
+              <option value="false">Tidak Menerima</option>
+            </select>
+          </div>
 
-          <DropdownButton
-            label="Pendidikan"
-            value={initialEducationLevel}
-            filterKey="education"
-            options={[
-              { value: 'all', label: 'Semua' },
-              { value: 'SD', label: 'SD' },
-              { value: 'SMP', label: 'SMP' },
-              { value: 'SMA_SMK', label: 'SMA/SMK' },
-              { value: 'PERGURUAN_TINGGI', label: 'Perguruan Tinggi' },
-              { value: 'TIDAK_SEKOLAH', label: 'Tidak Sekolah' }
-            ]}
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Pendidikan</label>
+            <select
+              value={educationLevel}
+              onChange={(e) => setEducationLevel(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm"
+            >
+              <option value="all">Semua</option>
+              <option value="SD">SD</option>
+              <option value="SMP">SMP</option>
+              <option value="SMA_SMK">SMA/SMK</option>
+              <option value="PERGURUAN_TINGGI">Perguruan Tinggi</option>
+              <option value="TIDAK_SEKOLAH">Tidak Sekolah</option>
+            </select>
+          </div>
 
-          <DropdownButton
-            label="Pekerjaan"
-            value={initialEmploymentStatus}
-            filterKey="employment"
-            options={[
-              { value: 'all', label: 'Semua' },
-              { value: 'BEKERJA', label: 'Bekerja' },
-              { value: 'TIDAK_BEKERJA', label: 'Tidak Bekerja' },
-              { value: 'PELAJAR', label: 'Pelajar' },
-              { value: 'MAHASISWA', label: 'Mahasiswa' }
-            ]}
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Pekerjaan</label>
+            <select
+              value={employmentStatus}
+              onChange={(e) => setEmploymentStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm"
+            >
+              <option value="all">Semua</option>
+              <option value="BEKERJA">Bekerja</option>
+              <option value="TIDAK_BEKERJA">Tidak Bekerja</option>
+              <option value="PELAJAR">Pelajar</option>
+              <option value="MAHASISWA">Mahasiswa</option>
+            </select>
+          </div>
         </div>
+
+        {/* Active Filters */}
+        {(searchQuery || hasActiveDropdownFilters) && (
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
+            <span className="text-sm font-medium text-gray-600 flex items-center gap-1">
+              <Tag className="w-3 h-3" />
+              Filter Aktif:
+            </span>
+            
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-md">
+                Pencarian: &quot;{searchQuery}&quot;
+                <button onClick={clearSearch} className="hover:text-blue-900">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            
+            {bpjsStatus !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-md">
+                BPJS: {getFilterLabel('bpjs', bpjsStatus)}
+              </span>
+            )}
+            
+            {socialAssistanceStatus !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-md">
+                Bantuan: {getFilterLabel('social', socialAssistanceStatus)}
+              </span>
+            )}
+            
+            {educationLevel !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-md">
+                Pendidikan: {getFilterLabel('education', educationLevel)}
+              </span>
+            )}
+            
+            {employmentStatus !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-100 text-cyan-800 text-xs font-medium rounded-md">
+                Pekerjaan: {getFilterLabel('employment', employmentStatus)}
+              </span>
+            )}
+            
+            {hasActiveDropdownFilters && (
+              <button
+                onClick={clearDropdownFilters}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-md transition-colors"
+              >
+                <X className="w-3 h-3" />
+                Hapus Filter
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
-  );
+  )
 }

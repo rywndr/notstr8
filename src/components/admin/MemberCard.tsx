@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { DeleteModal } from './DeleteModal';
+import Link from 'next/link';
 
 interface MemberCardProps {
   member: CommunityMember;
@@ -21,15 +22,15 @@ interface MemberCardProps {
 }
 
 const styles = {
-  card: "bg-white shadow-lg rounded-xl p-6 mb-6 w-full border border-slate-200 hover:shadow-xl transition-all duration-300 hover:border-indigo-200",
-  expandedCard: "bg-white shadow-lg rounded-xl p-8 mb-8 w-full border border-slate-200 hover:shadow-2xl transition-all duration-300 hover:border-indigo-300",
+  card: "bg-white shadow-lg rounded-xl p-6 mb-6 w-full border border-slate-200 hover:shadow-xl transition-all duration-300 hover:border-gray-300",
+  expandedCard: "bg-white shadow-lg rounded-xl p-8 mb-8 w-full border border-slate-200 hover:shadow-2xl transition-all duration-300 hover:border-gray-300",
   heading: "text-xl font-bold text-slate-800 mb-2",
   expandedHeading: "text-2xl font-bold text-slate-800 mb-4",
   text: "text-slate-600 mb-3",
   fileLink: "text-sky-600 hover:text-sky-800 underline font-medium inline-flex items-center gap-1",
-  iconBox: "w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm",
-  badge: "bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md",
-  toggleBtn: "flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-colors duration-200 font-medium text-sm",
+  iconBox: "w-8 h-8 rounded-lg flex items-center justify-center text-gray-600",
+  badge: "bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-semibold",
+  toggleBtn: "flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors duration-200 font-medium text-sm",
   statBadge: "px-2 py-1 rounded-md text-xs font-medium",
 };
 
@@ -39,20 +40,42 @@ export function MemberCard({ member}: MemberCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
 
-  const getBadgeColor = (type: string) => {
+  const getBadgeColor = (type: string, value?: string) => {
     switch(type) {
       case 'communityGroup': 
-        return member.communityGroup?.includes('Transgender') 
-          ? 'bg-pink-100 text-pink-800'
-          : member.communityGroup?.includes('Gay') 
-            ? 'bg-blue-100 text-blue-800'
-            : 'bg-purple-100 text-purple-800';
+        return 'bg-blue-100 text-blue-800';
+      case 'employment':
+        switch(value) {
+          case 'BEKERJA': return 'bg-green-100 text-green-800';
+          case 'TIDAK_BEKERJA': return 'bg-red-100 text-red-800';
+          case 'PELAJAR': return 'bg-blue-100 text-blue-800';
+          case 'MAHASISWA': return 'bg-purple-100 text-purple-800';
+          default: return 'bg-gray-100 text-gray-700';
+        }
       case 'education':
-        return member.isStillStudying 
-          ? 'bg-cyan-100 text-cyan-800'
-          : 'bg-slate-100 text-slate-700';
+        switch(value) {
+          case 'SD': return 'bg-yellow-100 text-yellow-800';
+          case 'SMP': return 'bg-orange-100 text-orange-800';
+          case 'SMA_SMK': return 'bg-blue-100 text-blue-800';
+          case 'PERGURUAN_TINGGI': return 'bg-purple-100 text-purple-800';
+          case 'TIDAK_SEKOLAH': return 'bg-gray-100 text-gray-800';
+          default: return 'bg-gray-100 text-gray-700';
+        }
+      case 'gender':
+        switch(value) {
+          case 'PRIA': return 'bg-blue-100 text-blue-800';
+          case 'WANITA': return 'bg-pink-100 text-pink-800';
+          default: return 'bg-gray-100 text-gray-700';
+        }
+      case 'marital':
+        switch(value) {
+          case 'BELUM_KAWIN': return 'bg-gray-100 text-gray-800';
+          case 'KAWIN': return 'bg-green-100 text-green-800';
+          case 'CERAI': return 'bg-red-100 text-red-800';
+          default: return 'bg-gray-100 text-gray-700';
+        }
       default:
-        return 'bg-slate-100 text-slate-800';
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
@@ -62,19 +85,19 @@ export function MemberCard({ member}: MemberCardProps) {
         {/* header w/ accent */}
         <div className={`relative ${isExpanded ? 'mb-6' : 'mb-4'}`}>
           {isExpanded ? (
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-500 rounded-t-xl"></div>
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-300 rounded-t-xl"></div>
           ) : (
-            <div className="absolute top-0 left-0 w-full h-1 bg-indigo-400 rounded-t-xl opacity-70"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gray-300 rounded-t-xl"></div>
           )}
           <div className={`flex justify-between items-start ${isExpanded ? 'pt-4' : 'pt-3'}`}>
             <div className="flex items-center gap-3">
-              <div className={`${styles.iconBox} bg-indigo-500`}>
+              <div className={styles.iconBox}>
                 <User size={18} />
               </div>
               <div>
                 <h3 className={isExpanded ? styles.expandedHeading : styles.heading}>{fullName}</h3>
                 {member.communityNickname && (
-                  <p className="text-indigo-600 text-sm font-medium">&quot;{member.communityNickname}&quot;</p>
+                  <p className="text-gray-600 text-sm font-medium">&quot;{member.communityNickname}&quot;</p>
                 )}
               </div>
             </div>
@@ -98,16 +121,14 @@ export function MemberCard({ member}: MemberCardProps) {
                 
                 {showActions && (
                   <div className="absolute right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[120px]">
-                    <button
-                      onClick={() => {
-                        // navigate to edit page
-                        window.location.href = `/admin/edit/${member.id}`;
-                      }}
+                    <Link
+                      href={`/admin/edit/${member.id}`}
                       className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 text-slate-700"
+                      onClick={() => setShowActions(false)}
                     >
                       <Edit3 size={14} />
                       Edit
-                    </button>
+                    </Link>
                     <button
                       onClick={() => {
                         setShowDeleteModal(true);
@@ -130,15 +151,15 @@ export function MemberCard({ member}: MemberCardProps) {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <Phone size={16} className="text-indigo-500" />
+                <Phone size={16} className="text-gray-500" />
                 <span className="text-slate-700">{member.phoneNumber || '-'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin size={16} className="text-indigo-500" />
+                <MapPin size={16} className="text-gray-500" />
                 <span className="text-slate-700">{member.domicileRegencyCity || '-'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Users size={16} className="text-indigo-500" />
+                <Users size={16} className="text-gray-500" />
                 <span className="text-slate-700">{member.communityGroup || '-'}</span>
               </div>
             </div>
@@ -150,13 +171,19 @@ export function MemberCard({ member}: MemberCardProps) {
                 </span>
               )}
               {member.employmentStatus && (
-                <span className={`${styles.statBadge} ${getBadgeColor('employment')}`}>
+                <span className={`${styles.statBadge} ${getBadgeColor('employment', member.employmentStatus)}`}>
                   <Briefcase size={12} className="inline mr-1" />
                   {member.employmentStatus}
                 </span>
               )}
+              {member.lastEducation && (
+                <span className={`${styles.statBadge} ${getBadgeColor('education', member.lastEducation)}`}>
+                  <BookOpen size={12} className="inline mr-1" />
+                  {member.lastEducation}
+                </span>
+              )}
               {member.isStillStudying != null && (
-                <span className={`${styles.statBadge} ${getBadgeColor('education')}`}>
+                <span className={`${styles.statBadge} ${member.isStillStudying ? 'bg-cyan-100 text-cyan-800' : 'bg-amber-100 text-amber-800'}`}>
                   <BookOpen size={12} className="inline mr-1" />
                   {member.isStillStudying ? 'Masih Bersekolah' : 'Tidak Bersekolah'}
                 </span>
@@ -167,7 +194,7 @@ export function MemberCard({ member}: MemberCardProps) {
                 </span>
               )}
               {member.gender && (
-                <span className="px-2 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-medium">
+                <span className={`px-2 py-1 rounded-md text-xs font-medium ${getBadgeColor('gender', member.gender)}`}>
                   {member.gender}
                 </span>
               )}
@@ -175,22 +202,32 @@ export function MemberCard({ member}: MemberCardProps) {
             
             <div className="border-t border-slate-200 pt-3 mt-3 text-sm grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <p className="text-slate-500 text-xs">Status Perkawinan</p>
-                <p className="font-medium text-slate-700">{member.maritalStatus || '-'}</p>
+                <p className="text-slate-500 text-xs pb-1">Status Perkawinan</p>
+                <p className={`font-medium text-xs px-2 py-1 rounded ${getBadgeColor('marital', member.maritalStatus || '')}`}>
+                  {member.maritalStatus || '-'}
+                </p>
               </div>
               <div>
-                <p className="text-slate-500 text-xs">Pendidikan</p>
-                <p className="font-medium text-slate-700">{member.lastEducation || '-'}</p>
+                <p className="text-slate-500 text-xs pb-1">Pendidikan</p>
+                <p className={`font-medium text-xs px-2 py-1 rounded ${getBadgeColor('education', member.lastEducation || '')}`}>
+                  {member.lastEducation || '-'}
+                </p>
               </div>
               <div>
-                <p className="text-slate-500 text-xs">Status BPJS</p>
-                <p className={`font-medium ${member.hasBpjs ? 'text-green-600' : 'text-red-500'}`}>
+                <p className="text-slate-500 text-xs pb-1">Status BPJS</p>
+                <p className={`font-medium text-xs px-2 py-1 rounded ${member.hasBpjs ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                   {member.hasBpjs ? 'Memiliki' : 'Tidak Memiliki'}
                 </p>
               </div>
               <div>
-                <p className="text-slate-500 text-xs">Bantuan Sosial</p>
-                <p className={`font-medium ${member.receivesSocialAssistance ? 'text-green-600' : 'text-slate-600'}`}>
+                <p className="text-slate-500 text-xs pb-1">Bantuan Sosial</p>
+                <p className={`font-medium text-xs px-2 py-1 rounded ${
+                  member.receivesSocialAssistance === null 
+                    ? 'bg-gray-100 text-gray-800' 
+                    : member.receivesSocialAssistance 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                }`}>
                   {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Menerima' : 'Tidak Menerima'}
                 </p>
               </div>
@@ -203,10 +240,10 @@ export function MemberCard({ member}: MemberCardProps) {
           <>
             {/* basic info grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <InfoCard icon={User} title="Informasi Pribadi" color="bg-indigo-500">
+              <InfoCard icon={User} title="Informasi Pribadi" color="text-gray-600">
                 <BasicInfo member={member} />
               </InfoCard>
-              <InfoCard icon={Phone} title="Kontak & Status" color="bg-violet-500">
+              <InfoCard icon={Phone} title="Kontak & Status" color="text-gray-600">
                 <ContactInfo member={member} />
               </InfoCard>
             </div>
@@ -247,12 +284,20 @@ export function MemberCard({ member}: MemberCardProps) {
             </div>
 
             {/* footer */}
-            <div className="mt-8 pt-6 border-t border-slate-200 bg-indigo-50 -mx-8 -mb-8 px-8 pb-8 rounded-b-xl">
-              <div className="flex items-center gap-2 text-indigo-500">
-                <Calendar size={14} />
-                <p className="text-xs">
-                  Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}
-                </p>
+            <div className="mt-8 pt-6 border-t border-slate-200 bg-gray-50 -mx-8 -mb-8 px-8 pb-8 rounded-b-xl">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Calendar size={14} />
+                  <p className="text-xs">
+                    Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Calendar size={14} />
+                  <p className="text-xs">
+                    Diperbarui pada: {new Date(member.updatedAt).toLocaleString('id-ID')}
+                  </p>
+                </div>
               </div>
             </div>
           </>
@@ -288,9 +333,7 @@ function InfoCard({ icon: Icon, title, color, children }: {
   return (
     <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
       <div className="flex items-center gap-3 mb-4">
-        <div className={`${styles.iconBox} ${color}`}>
-          <Icon size={16} />
-        </div>
+        <Icon size={16} className={color} />
         <h4 className="text-lg font-semibold text-slate-700">{title}</h4>
       </div>
       {children}
@@ -366,7 +409,13 @@ function PopulationData({ member }: { member: CommunityMember }) {
         <DataField label="No. KK" value={member.familyCardNumber} />
         <DataField label="Status E-KTP" value={member.ektpStatus} />
         {member.ektpStatus && 
-          <div className="mt-1 px-2 py-1 bg-purple-50 border border-purple-100 rounded text-xs text-purple-700 inline-block">
+          <div className={`mt-1 px-2 py-1 rounded text-xs font-medium inline-block ${
+            member.ektpStatus === 'MEMILIKI' 
+              ? 'bg-green-100 text-green-800 border border-green-200' 
+              : member.ektpStatus === 'TIDAK_MEMILIKI'
+                ? 'bg-red-100 text-red-800 border border-red-200'
+                : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+          }`}>
             {member.ektpStatus}
           </div>
         }
@@ -397,7 +446,13 @@ function AddressData({ member }: { member: CommunityMember }) {
         <DataField label="Status Kependudukan" value={member.residencyStatus} />
         <DataField label="Status Tempat Tinggal" value={member.livingSituation} />
         {member.livingSituation && 
-          <div className="mt-1 px-2 py-1 bg-teal-50 border border-teal-100 rounded text-xs text-teal-700 inline-block">
+          <div className={`mt-1 px-2 py-1 rounded text-xs font-medium inline-block ${
+            member.livingSituation === 'RUMAH_PRIBADI' 
+              ? 'bg-green-100 text-green-800 border border-green-200' 
+              : member.livingSituation === 'BERSAMA_ORANG_TUA'
+                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                : 'bg-orange-100 text-orange-800 border border-orange-200'
+          }`}>
             {member.livingSituation}
           </div>
         }

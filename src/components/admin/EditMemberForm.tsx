@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { updateMember } from '@/actions/communityMember';
 import { CommunityMember } from '../../../prisma/app/generated/prisma';
-import { Save, ArrowLeft } from 'lucide-react';
 import { 
   handleDigitInput, 
   handlePhoneInput, 
@@ -12,15 +10,17 @@ import {
   handleDateOfBirthChange,
   handleAgeChange
 } from '@/utils/formHandlers';
+import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface EditMemberFormProps {
   member: CommunityMember;
+  isUserEdit?: boolean;
 }
 
-export function EditMemberForm({ member }: EditMemberFormProps) {
-  const router = useRouter();
+export function EditMemberForm({ member, isUserEdit = false }: EditMemberFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Format phone number for display (remove +62 prefix)
   const formatPhoneNumber = (phone: string | null) => {
     if (!phone) return '';
@@ -95,7 +95,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Process phone number - fix the double prefix issue
       let processedPhoneNumber = null;
@@ -117,13 +117,20 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
 
       const result = await updateMember(member.id, processedData);
       if (result.success) {
-        router.push('/admin');
+        toast.success('Data berhasil diperbarui!', {
+          description: 'Perubahan telah disimpan dalam database.',
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        alert('Gagal update member');
+        toast.error('Gagal memperbarui data', {
+          description: result.error || 'Terjadi kesalahan saat menyimpan data.',
+        });
       }
     } catch (error: unknown) {
       console.error('Error updating member:', error);
-      alert('Terjadi kesalahan');
+      toast.error('Terjadi kesalahan', {
+        description: 'Tidak dapat menyimpan perubahan. Silakan coba lagi.',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -140,19 +147,21 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
     }
   };
 
-  const commonInputStyle = "mt-2 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none";
+  const commonInputStyle = "mt-2 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none";
   const commonLabelStyle = "block text-sm font-medium text-slate-700 mb-1";
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8">
-      <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={() => router.back()}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-        >
-          <ArrowLeft size={20} className="text-slate-600" />
-        </button>
-        <h2 className="text-xl font-semibold text-slate-800">Edit Data Anggota</h2>
+    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-slate-900">
+          {isUserEdit ? 'Edit Data Anda' : 'Edit Data Member'}
+        </h2>
+        <p className="text-sm text-slate-600 mt-1">
+          {isUserEdit 
+            ? 'Perbarui informasi data komunitas Anda di bawah ini'
+            : 'Perbarui informasi member di bawah ini'
+          }
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -345,11 +354,11 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               name="idScanUrl" 
               id="idScanUrl" 
               accept="image/*" 
-              className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`}
+              className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100`}
               disabled={formData.ektpStatus !== "MEMILIKI"}
             />
             {member.idScanUrl && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-slate-500">
                 File saat ini: {member.idScanUrl}
               </p>
             )}
@@ -480,7 +489,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
                 placeholder="81234567890"
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-slate-500">
               Format: +62 8xxx-xxxx-xxx (hanya masukkan angka setelah +62, harus diawali dengan 8)
             </p>
           </div>
@@ -600,7 +609,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               id="hasOwnBusiness"
               checked={formData.hasOwnBusiness}
               onChange={handleChange}
-              className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+              className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             />
             <label htmlFor="hasOwnBusiness" className="ml-2 block text-sm text-slate-900">Memiliki Usaha Sendiri?</label>
           </div>
@@ -630,7 +639,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               id="hasReceivedSkillTraining"
               checked={formData.hasReceivedSkillTraining}
               onChange={handleChange}
-              className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+              className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             />
             <label htmlFor="hasReceivedSkillTraining" className="ml-2 block text-sm text-slate-900">Pernah Menerima Pelatihan Keterampilan Usaha?</label>
           </div>
@@ -673,7 +682,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               id="hasBpjs"
               checked={formData.hasBpjs}
               onChange={handleChange}
-              className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+              className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             />
             <label htmlFor="hasBpjs" className="ml-2 block text-sm text-slate-900">Apakah memiliki BPJS?</label>
           </div>
@@ -700,11 +709,11 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               name="bpjsScanUrl" 
               id="bpjsScanUrl" 
               accept="image/*" 
-              className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`} 
+              className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100`} 
               disabled={!formData.hasBpjs}
             />
             {member.bpjsScanUrl && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-slate-500">
                 File saat ini: {member.bpjsScanUrl}
               </p>
             )}
@@ -813,7 +822,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               checked={formData.wasDiscriminationReported}
               onChange={handleChange}
               disabled={formData.discriminationExperience !== "PERNAH_MENGALAMI"}
-              className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+              className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             />
             <label htmlFor="wasDiscriminationReported" className="ml-2 block text-sm text-slate-900">Apakah Diskriminasi/Kekerasan Telah Dilaporkan?</label>
           </div>
@@ -829,7 +838,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               id="receivesSocialAssistance"
               checked={formData.receivesSocialAssistance}
               onChange={handleChange}
-              className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+              className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             />
             <label htmlFor="receivesSocialAssistance" className="ml-2 block text-sm text-slate-900">Mendapatkan Bantuan Sosial dari Pemerintah?</label>
           </div>
@@ -841,7 +850,7 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
               id="isRegisteredInDTKS"
               checked={formData.isRegisteredInDTKS}
               onChange={handleChange}
-              className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+              className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             />
             <label htmlFor="isRegisteredInDTKS" className="ml-2 block text-sm text-slate-900">Terdaftar dalam Data Terpadu Kesejahteraan Sosial (DTKS)?</label>
           </div>
@@ -859,26 +868,20 @@ export function EditMemberForm({ member }: EditMemberFormProps) {
           </div>
         </fieldset>
 
-        <div className="flex justify-end gap-3 pt-6 border-t border-slate-200">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-            disabled={isSubmitting}
+        <div className="flex gap-3 pt-6">
+          <Link
+            href={isUserEdit ? '/' : '/admin'}
+            className="flex-1 text-center px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md font-medium transition-colors"
           >
-            Batal
-          </button>
+            {isUserEdit ? 'Kembali' : 'Batal'}
+          </Link>
+
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="flex-1 bg-slate-700 hover:bg-slate-800 disabled:bg-slate-300 text-white py-2.5 px-4 rounded-md font-medium transition-colors"
           >
-            {isSubmitting ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Save size={16} />
-            )}
-            {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+            {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
           </button>
         </div>
       </form>

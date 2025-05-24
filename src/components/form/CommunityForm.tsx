@@ -9,6 +9,7 @@ import {
   handleDateOfBirthChange,
   handleAgeChange
 } from '@/utils/formHandlers';
+import { toast } from 'sonner';
 
 export default function CommunityForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -38,8 +39,17 @@ export default function CommunityForm() {
 
     if (result?.error) {
       setMessage(`Error: ${result.error}`);
+      toast.error('Gagal mengirim data', {
+        description: result.error,
+      });
     } else if (result?.success) {
       setMessage(result.success);
+      toast.success('Data berhasil dikirim!', {
+        description: 'Terima kasih telah mengisi formulir pendataan komunitas.',
+      });
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
       formRef.current?.reset(); // Reset form on success
       
       // Reset all state variables
@@ -56,20 +66,23 @@ export default function CommunityForm() {
       setAge("");
     } else {
       setMessage('Terjadi kesalahan yang tidak diketahui.');
+      toast.error('Terjadi kesalahan', {
+        description: 'Tidak dapat mengirim data. Silakan coba lagi.',
+      });
     }
     setIsLoading(false);
   }
 
-  const commonInputStyle = "mt-2 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none";
+  const commonInputStyle = "mt-2 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none";
   const commonLabelStyle = "block text-sm font-medium text-slate-700 mb-1";
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 bg-slate-50 py-8 rounded-lg shadow-md w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 bg-white py-8 rounded-lg shadow-md w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border border-slate-200">
       <h2 className="text-2xl font-semibold text-slate-800 mb-6">Formulir Data Komunitas</h2>
 
-      {message && <p className={`p-3 rounded-md ${message.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{message}</p>}
+      {message && <p className={`p-3 rounded-md ${message.startsWith('Error:') ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>{message}</p>}
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Data Pribadi</legend>
 
         <div className="mb-4">
@@ -140,7 +153,7 @@ export default function CommunityForm() {
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Data Kependudukan</legend>
         <div className="mb-4">
           <label htmlFor="nik" className={commonLabelStyle}>NIK (Nomor Induk Kependudukan)</label>
@@ -190,14 +203,14 @@ export default function CommunityForm() {
             name="idScanUrl" 
             id="idScanUrl" 
             accept="image/*" 
-            className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`}
+            className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100`}
             disabled={!hasEktp}
           />
         </div>
 
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Alamat Domisili</legend>
         <div className="mb-4">
           <label htmlFor="address" className={commonLabelStyle}>Alamat Lengkap (Jalan, Nomor, RT/RW)</label>
@@ -238,7 +251,7 @@ export default function CommunityForm() {
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Kontak</legend>
         <div className="mb-4">
           <label htmlFor="phoneNumber" className={commonLabelStyle}>Kontak Yang Bisa Dihubungi</label>
@@ -261,7 +274,7 @@ export default function CommunityForm() {
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Status Sosial & Ekonomi</legend>
         <div className="mb-4">
           <label htmlFor="maritalStatus" className={commonLabelStyle}>Status Perkawinan</label>
@@ -299,7 +312,7 @@ export default function CommunityForm() {
             type="checkbox" 
             name="isStillStudying" 
             id="isStillStudying" 
-            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+            className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             checked={isStillStudying}
             onChange={(e) => setIsStillStudying(e.target.checked)}
             disabled={educationLevel === "TIDAK_SEKOLAH"}
@@ -354,7 +367,7 @@ export default function CommunityForm() {
             type="checkbox" 
             name="hasOwnBusiness" 
             id="hasOwnBusiness" 
-            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             onChange={(e) => setHasOwnBusiness(e.target.checked)}
             checked={hasOwnBusiness}
           />
@@ -373,14 +386,14 @@ export default function CommunityForm() {
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Pelatihan</legend>
         <div className="flex items-center mt-2 mb-4">
           <input 
             type="checkbox" 
             name="hasReceivedSkillTraining" 
             id="hasReceivedSkillTraining" 
-            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500" 
             onChange={(e) => setHasReceivedTraining(e.target.checked)}
             checked={hasReceivedTraining}
           />
@@ -403,19 +416,20 @@ export default function CommunityForm() {
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Informasi BPJS</legend>
         <div className="flex items-center mb-4">
           <input 
             type="checkbox" 
             name="hasBpjs" 
             id="hasBpjs" 
-            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500" 
             onChange={(e) => setHasBpjs(e.target.checked)}
             checked={hasBpjs}
           />
           <label htmlFor="hasBpjs" className="ml-2 block text-sm text-slate-900">Apakah memiliki BPJS?</label>
         </div>
+
         <div className={`mb-4 ${!hasBpjs ? 'opacity-50' : ''}`}>
           <label htmlFor="bpjsId" className={commonLabelStyle}>Nomor BPJS</label>
           <input 
@@ -435,13 +449,13 @@ export default function CommunityForm() {
             name="bpjsScanUrl" 
             id="bpjsScanUrl" 
             accept="image/*" 
-            className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100`} 
+            className={`${commonInputStyle} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100`} 
             disabled={!hasBpjs}
           />
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Data Kesehatan</legend>
         <div className="mb-4">
           <label htmlFor="healthServiceAccess" className={commonLabelStyle}>Akses Layanan Kesehatan Terakhir/Rutin</label>
@@ -459,7 +473,7 @@ export default function CommunityForm() {
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Pengalaman Diskriminasi/Kekerasan</legend>
         <div className="mb-4">
           <label htmlFor="discriminationExperience" className={commonLabelStyle}>Pernah Mengalami Diskriminasi atau Kekerasan?</label>
@@ -516,21 +530,21 @@ export default function CommunityForm() {
             type="checkbox" 
             name="wasDiscriminationReported" 
             id="wasDiscriminationReported" 
-            className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" 
+            className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500" 
             disabled={!hasDiscrimination}
           />
           <label htmlFor="wasDiscriminationReported" className="ml-2 block text-sm text-slate-900">Apakah Diskriminasi/Kekerasan Telah Dilaporkan?</label>
         </div>
       </fieldset>
 
-      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-white">
+      <fieldset className="border border-slate-200 p-6 rounded-md shadow-sm bg-slate-50">
         <legend className="text-lg font-semibold text-slate-700 px-2">Bantuan Sosial & Komunitas</legend>
         <div className="flex items-center mt-2 mb-4">
-          <input type="checkbox" name="receivesSocialAssistance" id="receivesSocialAssistance" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+          <input type="checkbox" name="receivesSocialAssistance" id="receivesSocialAssistance" className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500" />
           <label htmlFor="receivesSocialAssistance" className="ml-2 block text-sm text-slate-900">Mendapatkan Bantuan Sosial dari Pemerintah?</label>
         </div>
         <div className="flex items-center mt-2 mb-4">
-          <input type="checkbox" name="isRegisteredInDTKS" id="isRegisteredInDTKS" className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+          <input type="checkbox" name="isRegisteredInDTKS" id="isRegisteredInDTKS" className="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500" />
           <label htmlFor="isRegisteredInDTKS" className="ml-2 block text-sm text-slate-900">Terdaftar dalam Data Terpadu Kesejahteraan Sosial (DTKS)?</label>
         </div>
         <div className="mb-4">
@@ -542,7 +556,7 @@ export default function CommunityForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:shadow-outline disabled:opacity-50"
+        className="w-full bg-slate-700 hover:bg-slate-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all duration-200"
       >
         {isLoading ? 'Mengirim...' : 'Kirim Data'}
       </button>
