@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, Filter, X, Tag } from 'lucide-react'
+import { useDebounce } from '@/hooks/useDebounce'
 
 interface FilterControlsProps {
   initialSearchQuery: string
@@ -28,20 +29,13 @@ export function FilterControls({
   const [educationLevel, setEducationLevel] = useState(initialEducationLevel)
   const [employmentStatus, setEmploymentStatus] = useState(initialEmploymentStatus)
 
-  // Auto-apply filters when values change
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      applyFilters()
-    }, 300) // Debounce search input
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
-    return () => clearTimeout(timeoutId)
-  }, [searchQuery, bpjsStatus, socialAssistanceStatus, educationLevel, employmentStatus])
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
     
-    if (searchQuery) {
-      params.set('search', searchQuery)
+    if (debouncedSearchQuery) {
+      params.set('search', debouncedSearchQuery)
     } else {
       params.delete('search')
     }
@@ -72,7 +66,11 @@ export function FilterControls({
     
     params.set('page', '1') // Reset to first page
     router.push(`/admin?${params.toString()}`)
-  }
+  }, [debouncedSearchQuery, bpjsStatus, socialAssistanceStatus, educationLevel, employmentStatus, router, searchParams])
+
+  useEffect(() => {
+    applyFilters()
+  }, [applyFilters])
 
   const clearSearch = () => {
     setSearchQuery('')
