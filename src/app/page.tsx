@@ -15,11 +15,11 @@ const Landing = () => {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6">
             Pendataan Komunitas
             <span className="block bg-gradient-to-r from-slate-600 to-slate-800 bg-clip-text text-transparent mt-2 pb-1.5">
-              Waria Tanjungpinang
+              Waria Wilayah Bintan Raya
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 mb-10 leading-relaxed">
-            Sebuah inisiatif untuk mendukung pendataan yang akurat dan pemahaman yang lebih baik demi kesejahteraan bersama komunitas waria di Kota Tanjungpinang.
+            Sebuah inisiatif untuk mendukung pendataan yang akurat dan pemahaman yang lebih baik demi kesejahteraan bersama komunitas waria di wilayah Bintan Raya.
           </p>
           <Link
             href="/form"
@@ -65,7 +65,7 @@ const Landing = () => {
             <Users className="h-16 w-16 text-slate-700 mx-auto mb-4" />
             <h2 className="text-3xl font-bold mb-4 text-slate-800">Tentang Program Ini</h2>
             <p className="text-slate-600 text-lg leading-relaxed">
-              Program pendataan ini bertujuan untuk mengumpulkan informasi yang valid dan komprehensif mengenai komunitas waria di Tanjungpinang. Data yang terkumpul akan digunakan secara bertanggung jawab untuk advokasi, perencanaan program pemberdayaan, dan peningkatan akses terhadap layanan yang dibutuhkan, demi mewujudkan masyarakat yang lebih inklusif dan suportif.
+              Program pendataan ini bertujuan untuk mengumpulkan informasi yang valid dan komprehensif mengenai komunitas waria di wilayah Bintan Raya. Data yang terkumpul akan digunakan secara bertanggung jawab untuk advokasi, perencanaan program pemberdayaan, dan peningkatan akses terhadap layanan yang dibutuhkan, demi mewujudkan masyarakat yang lebih inklusif dan suportif.
             </p>
           </div>
         </div>
@@ -100,8 +100,8 @@ const Landing = () => {
             <Image 
               src="/stti-logo.png"
               alt="Logo Sekolah Tinggi Teknologi Indonesia Tanjung Pinang"
-              width={256}
-              height={256}
+              width={128}
+              height={128}
               className="mb-4" 
             />
             <p className="text-xl text-slate-700 font-semibold">

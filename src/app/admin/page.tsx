@@ -42,7 +42,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   });
   
   if (!dbUser || dbUser.role !== 'ADMIN') {
-    redirect('/access-denied');
+    redirect('/');
   }
 
   const params = await searchParams;

@@ -97,7 +97,9 @@ export function MemberCard({ member}: MemberCardProps) {
               <div>
                 <h3 className={isExpanded ? styles.expandedHeading : styles.heading}>{fullName}</h3>
                 {member.communityNickname && (
-                  <p className="text-gray-600 text-sm font-medium">&quot;{member.communityNickname}&quot;</p>
+                  <p className="text-gray-600 text-sm font-medium">
+                    <span className="text-xs text-gray-500">alias </span>
+                    &quot;{member.communityNickname}&quot;</p>
                 )}
               </div>
             </div>
@@ -165,37 +167,26 @@ export function MemberCard({ member}: MemberCardProps) {
             </div>
             
             <div className="flex flex-wrap gap-2 mt-2">
-              {member.communityGroup && (
-                <span className={`${styles.statBadge} ${getBadgeColor('communityGroup')}`}>
-                  {member.communityGroup}
-                </span>
-              )}
               {member.employmentStatus && (
                 <span className={`${styles.statBadge} ${getBadgeColor('employment', member.employmentStatus)}`}>
                   <Briefcase size={12} className="inline mr-1" />
-                  {member.employmentStatus}
-                </span>
-              )}
-              {member.lastEducation && (
-                <span className={`${styles.statBadge} ${getBadgeColor('education', member.lastEducation)}`}>
-                  <BookOpen size={12} className="inline mr-1" />
-                  {member.lastEducation}
+                  {member.employmentStatus.toUpperCase()}
                 </span>
               )}
               {member.isStillStudying != null && (
                 <span className={`${styles.statBadge} ${member.isStillStudying ? 'bg-cyan-100 text-cyan-800' : 'bg-amber-100 text-amber-800'}`}>
                   <BookOpen size={12} className="inline mr-1" />
-                  {member.isStillStudying ? 'Masih Bersekolah' : 'Tidak Bersekolah'}
+                  {member.isStillStudying ? 'MASIH BERSEKOLAH' : 'TIDAK BERSEKOLAH'}
                 </span>
               )}
               {member.age && (
                 <span className="px-2 py-1 rounded-md bg-indigo-100 text-indigo-800 text-xs font-medium">
-                  {member.age} Tahun
+                  {member.age} TAHUN
                 </span>
               )}
               {member.gender && (
                 <span className={`px-2 py-1 rounded-md text-xs font-medium ${getBadgeColor('gender', member.gender)}`}>
-                  {member.gender}
+                  {member.gender.toUpperCase()}
                 </span>
               )}
             </div>
@@ -204,19 +195,19 @@ export function MemberCard({ member}: MemberCardProps) {
               <div>
                 <p className="text-slate-500 text-xs pb-1">Status Perkawinan</p>
                 <p className={`font-medium text-xs px-2 py-1 rounded ${getBadgeColor('marital', member.maritalStatus || '')}`}>
-                  {member.maritalStatus || '-'}
+                  {member.maritalStatus?.toUpperCase() || '-'}
                 </p>
               </div>
               <div>
                 <p className="text-slate-500 text-xs pb-1">Pendidikan</p>
                 <p className={`font-medium text-xs px-2 py-1 rounded ${getBadgeColor('education', member.lastEducation || '')}`}>
-                  {member.lastEducation || '-'}
+                  {member.lastEducation?.toUpperCase() || '-'}
                 </p>
               </div>
               <div>
                 <p className="text-slate-500 text-xs pb-1">Status BPJS</p>
                 <p className={`font-medium text-xs px-2 py-1 rounded ${member.hasBpjs ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {member.hasBpjs ? 'Memiliki' : 'Tidak Memiliki'}
+                  {member.hasBpjs ? 'MEMILIKI' : 'TIDAK MEMILIKI'}
                 </p>
               </div>
               <div>
@@ -228,8 +219,26 @@ export function MemberCard({ member}: MemberCardProps) {
                       ? 'bg-green-100 text-green-800' 
                       : 'bg-red-100 text-red-800'
                 }`}>
-                  {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Menerima' : 'Tidak Menerima'}
+                  {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'MENERIMA' : 'TIDAK MENERIMA'}
                 </p>
+              </div>
+            </div>
+
+            {/* footer info when collapsed */}
+            <div className="border-t border-slate-200 pt-2 mt-3 bg-gray-50 -mx-6 -mb-6 px-6 pb-4 rounded-b-xl">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Calendar size={12} />
+                  <p className="text-xs">
+                    Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Calendar size={12} />
+                  <p className="text-xs">
+                    Diperbarui pada: {new Date(member.updatedAt).toLocaleString('id-ID')}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

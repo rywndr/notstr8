@@ -62,7 +62,9 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
           <div>
             <div className="text-sm font-medium text-gray-900">{fullName}</div>
             {member.communityNickname && (
-              <div className="text-xs text-gray-500">&quot;{member.communityNickname}&quot;</div>
+              <div className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500">alias </span>
+                &quot;{member.communityNickname}&quot;</div>
             )}
             <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
               <Phone className="w-3 h-3" />
@@ -107,7 +109,7 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
             <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-md ${
               member.hasBpjs ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
             }`}>
-              BPJS: {member.hasBpjs ? 'Ya' : 'Tidak'}
+              BPJS: {member.hasBpjs ? 'YA' : 'TIDAK'}
             </span>
             <br />
             <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-md ${
@@ -117,7 +119,7 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
                   ? 'bg-green-100 text-green-800' 
                   : 'bg-red-100 text-red-800'
             }`}>
-              Bansos: {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Ya' : 'Tidak'}
+              Bansos: {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'YA' : 'TIDAK'}
             </span>
           </div>
         </td>
@@ -125,7 +127,7 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
           <div className="flex items-center gap-1 text-xs">
             <Calendar className="w-3 h-3" />
-            <span className="text-gray-600">Terdaftar:</span>
+            <span className="text-gray-600">Terdaftar pada:</span>
           </div>
           <div className="text-xs font-medium text-gray-900">
             {formatDate(member.createdAt)}
@@ -138,7 +140,7 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
           </div>
           <div className="flex items-center gap-1 text-xs mt-1">
             <Calendar className="w-3 h-3" />
-            <span className="text-gray-600">Diperbarui:</span>
+            <span className="text-gray-600">Diperbarui pada:</span>
           </div>
           <div className="text-xs text-gray-700">
             {formatDate(member.updatedAt)}
@@ -237,6 +239,24 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
                   <SocialAssistanceData member={member} />
                 </MemberSection>
               </div>
+
+              {/* footer */}
+              <div className="mt-6 pt-4 border-t border-gray-200 bg-gray-50 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Calendar size={12} />
+                    <p className="text-xs">
+                      Terdaftar pada: {formatDate(member.createdAt)} {new Date(member.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Calendar size={12} />
+                    <p className="text-xs">
+                      Diperbarui pada: {formatDate(member.updatedAt)} {new Date(member.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </td>
         </tr>
@@ -252,7 +272,6 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
   )
 }
 
-// Shared utility components (same as MemberCard)
 function DataField({ label, value, className = "" }: { label: string; value: string | null | undefined; className?: string }) {
   return (
     <div className={`mb-2 flex flex-col sm:flex-row sm:justify-between gap-1 ${className}`}>
