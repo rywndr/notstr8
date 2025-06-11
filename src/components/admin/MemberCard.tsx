@@ -2,7 +2,8 @@
 
 import { CommunityMember } from '../../../prisma/app/generated/prisma';
 import { MemberSection } from './MemberSection';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { formatDate, formatDateTime, getBadgeColor, formatDisplayValue } from '@/utils/formHandlers';
 import {
   User, Phone, MapPin, Users,
   IdCard, TrendingUp, Award, Shield, Heart,
@@ -38,46 +39,13 @@ export function MemberCard({ member}: MemberCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const getBadgeColor = (type: string, value?: string) => {
-    switch(type) {
-      case 'communityGroup': 
-        return 'bg-blue-100 text-blue-800';
-      case 'employment':
-        switch(value) {
-          case 'BEKERJA': return 'bg-green-100 text-green-800';
-          case 'TIDAK_BEKERJA': return 'bg-red-100 text-red-800';
-          case 'PELAJAR': return 'bg-blue-100 text-blue-800';
-          case 'MAHASISWA': return 'bg-purple-100 text-purple-800';
-          default: return 'bg-gray-100 text-gray-700';
-        }
-      case 'education':
-        switch(value) {
-          case 'SD': return 'bg-yellow-100 text-yellow-800';
-          case 'SMP': return 'bg-orange-100 text-orange-800';
-          case 'SMA_SMK': return 'bg-blue-100 text-blue-800';
-          case 'PERGURUAN_TINGGI': return 'bg-purple-100 text-purple-800';
-          case 'TIDAK_SEKOLAH': return 'bg-gray-100 text-gray-800';
-          default: return 'bg-gray-100 text-gray-700';
-        }
-      case 'gender':
-        switch(value) {
-          case 'PRIA': return 'bg-blue-100 text-blue-800';
-          case 'WANITA': return 'bg-pink-100 text-pink-800';
-          default: return 'bg-gray-100 text-gray-700';
-        }
-      case 'marital':
-        switch(value) {
-          case 'BELUM_KAWIN': return 'bg-gray-100 text-gray-800';
-          case 'KAWIN': return 'bg-green-100 text-green-800';
-          case 'CERAI': return 'bg-red-100 text-red-800';
-          default: return 'bg-gray-100 text-gray-700';
-        }
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
+  const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
 
   return (
     <>
@@ -230,13 +198,13 @@ export function MemberCard({ member}: MemberCardProps) {
                 <div className="flex items-center gap-2 text-gray-500">
                   <Calendar size={12} />
                   <p className="text-xs">
-                    Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}
+                    Terdaftar pada: {formatDateTime(member.createdAt, mounted)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-500">
                   <Calendar size={12} />
                   <p className="text-xs">
-                    Diperbarui pada: {new Date(member.updatedAt).toLocaleString('id-ID')}
+                    Diperbarui pada: {formatDateTime(member.updatedAt, mounted)}
                   </p>
                 </div>
               </div>
@@ -298,13 +266,13 @@ export function MemberCard({ member}: MemberCardProps) {
                 <div className="flex items-center gap-2 text-gray-500">
                   <Calendar size={14} />
                   <p className="text-xs">
-                    Terdaftar pada: {new Date(member.createdAt).toLocaleString('id-ID')}
+                    Terdaftar pada: {formatDateTime(member.createdAt, mounted)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-500">
                   <Calendar size={14} />
                   <p className="text-xs">
-                    Diperbarui pada: {new Date(member.updatedAt).toLocaleString('id-ID')}
+                    Diperbarui pada: {formatDateTime(member.updatedAt, mounted)}
                   </p>
                 </div>
               </div>
@@ -360,7 +328,7 @@ function DataField({ label, value, className = "" }: { label: string; value: str
 }
 
 function BooleanField({ label, value, className = "" }: { label: string; value: boolean | null; className?: string }) {
-  const displayValue = value === null ? '-' : value ? 'Ya' : 'Tidak';
+  const displayValue = formatDisplayValue(value);
   const colorClass = value === true ? 'text-green-600' : value === false ? 'text-red-500' : 'text-slate-600';
   
   return (
@@ -384,12 +352,18 @@ function FileLink({ label, url }: { label: string; url: string | null }) {
 }
 
 function BasicInfo({ member }: { member: CommunityMember }) {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div>
       <DataField label="Nama Panggilan Komunitas" value={member.communityNickname} />
       <DataField 
         label="Tempat, Tanggal Lahir" 
-        value={`${member.placeOfBirth || '-'}, ${member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString('id-ID') : '-'}`} 
+        value={`${member.placeOfBirth || '-'}, ${formatDate(member.dateOfBirth, mounted)}`} 
       />
       <DataField label="Usia" value={member.age ? `${member.age} tahun` : null} />
       <DataField label="Jenis Kelamin" value={member.gender} />

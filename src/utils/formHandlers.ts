@@ -141,3 +141,56 @@ export const handleAgeChange = (
     }
   }
 };
+
+export const formatDate = (date: Date | string | null, mounted: boolean = true): string => {
+  if (!mounted || !date) return '-';
+  return new Date(date).toLocaleDateString('id-ID');
+};
+
+export const formatDateTime = (date: Date | string | null, mounted: boolean = true): string => {
+  if (!mounted || !date) return '';
+  return new Date(date).toLocaleString('id-ID');
+};
+
+export const formatDisplayValue = (value: boolean | null): string => {
+  return value === null ? '-' : value ? 'Ya' : 'Tidak';
+};
+
+export const getBadgeColor = (type: string, value?: string): string => {
+  switch(type) {
+    case 'communityGroup': 
+      return 'bg-blue-100 text-blue-800';
+    case 'employment':
+      switch(value) {
+        case 'BEKERJA': return 'bg-green-100 text-green-800';
+        case 'TIDAK_BEKERJA': return 'bg-red-100 text-red-800';
+        case 'PELAJAR': return 'bg-blue-100 text-blue-800';
+        case 'MAHASISWA': return 'bg-purple-100 text-purple-800';
+        default: return 'bg-gray-100 text-gray-700';
+      }
+    case 'education':
+      switch(value) {
+        case 'SD': return 'bg-yellow-100 text-yellow-800';
+        case 'SMP': return 'bg-orange-100 text-orange-800';
+        case 'SMA_SMK': return 'bg-blue-100 text-blue-800';
+        case 'PERGURUAN_TINGGI': return 'bg-purple-100 text-purple-800';
+        case 'TIDAK_SEKOLAH': return 'bg-gray-100 text-gray-800';
+        default: return 'bg-gray-100 text-gray-700';
+      }
+    case 'gender':
+      switch(value) {
+        case 'PRIA': return 'bg-blue-100 text-blue-800';
+        case 'WANITA': return 'bg-pink-100 text-pink-800';
+        default: return 'bg-gray-100 text-gray-700';
+      }
+    case 'marital':
+      switch(value) {
+        case 'BELUM_KAWIN': return 'bg-gray-100 text-gray-800';
+        case 'KAWIN': return 'bg-green-100 text-green-800';
+        case 'CERAI': return 'bg-red-100 text-red-800';
+        default: return 'bg-gray-100 text-gray-700';
+      }
+    default:
+      return 'bg-gray-100 text-gray-700';
+  }
+};

@@ -5,6 +5,7 @@ import { EmptyState } from '@/components/admin/EmptyState';
 import { AdminPagination } from '@/components/admin/AdminPagination';
 import { FilterControls } from '@/components/admin/FilterControls';
 import { PageSizeSelector } from '@/components/admin/PageSizeSelector';
+import { ExportButton } from '@/components/admin/ExportButton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Grid3x3, Table } from 'lucide-react';
 import { MemberTable } from '@/components/admin/MemberTable';
@@ -87,22 +88,33 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <EmptyState hasFilters={searchQuery !== '' || bpjsStatus !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all'} />
           ) : (
             <Tabs defaultValue="grid" className="w-full">
-              <div className="flex justify-between items-center mb-6">
-                <div className="text-sm text-slate-600">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                <div className="text-sm text-slate-600 order-2 lg:order-1">
                   Menampilkan {members.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)} dari {totalCount} hasil
                 </div>
-                <div className="flex items-center gap-4">
-                  <TabsList>
-                    <TabsTrigger value="grid" className="flex items-center gap-2 transition-all duration-300 ease-in-out data-[state=active]:scale-105 data-[state=active]:shadow-md">
-                      <Grid3x3 className="w-4 h-4" />
-                      <span className="hidden sm:inline">Grid</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="table" className="flex items-center gap-2 transition-all duration-300 ease-in-out data-[state=active]:scale-105 data-[state=active]:shadow-md">
-                      <Table className="w-4 h-4" />
-                      <span className="hidden sm:inline">Table</span>
-                    </TabsTrigger>
-                  </TabsList>
-                  <PageSizeSelector currentPageSize={pageSize} />
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto order-1 lg:order-2">
+                  <div className="flex items-center justify-between sm:justify-end gap-3">
+                    <div className="flex items-center gap-3">
+                      <TabsList>
+                        <TabsTrigger value="grid" className="flex items-center gap-2 transition-all duration-300 ease-in-out data-[state=active]:scale-105 data-[state=active]:shadow-md">
+                          <Grid3x3 className="w-4 h-4" />
+                          <span className="hidden sm:inline">Grid</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="table" className="flex items-center gap-2 transition-all duration-300 ease-in-out data-[state=active]:scale-105 data-[state=active]:shadow-md">
+                          <Table className="w-4 h-4" />
+                          <span className="hidden sm:inline">Table</span>
+                        </TabsTrigger>
+                      </TabsList>
+                      <PageSizeSelector currentPageSize={pageSize} />
+                      <ExportButton 
+                      searchQuery={searchQuery}
+                      bpjsStatus={bpjsStatus}
+                      socialAssistanceStatus={socialAssistanceStatus}
+                      educationLevel={educationLevel}
+                      employmentStatus={employmentStatus}
+                    />
+                    </div>
+                  </div>
                 </div>
               </div>
               
