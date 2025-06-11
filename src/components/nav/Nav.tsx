@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import AuthButton from '../auth/AuthButton';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth, AuthUser } from '../../hooks/useAuth';
 import { MobileProfileSection } from './MobileProfileSection';
 
 const Nav = () => {
@@ -17,6 +17,11 @@ const Nav = () => {
 
   const handleNavigate = () => {
     setIsOpen(false);
+  };
+
+  // Extract user name from user metadata or email
+  const getUserName = (user: AuthUser) => {
+    return user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || "User";
   };
 
   return (
@@ -119,7 +124,11 @@ const Nav = () => {
 
             {/* Mobile Auth Section */}
             {user ? (
-              <MobileProfileSection user={user} onNavigate={handleNavigate} />
+              <MobileProfileSection 
+                user={user} 
+                userName={getUserName(user)}
+                onNavigate={handleNavigate} 
+              />
             ) : (
               <div className="px-3 py-2 border-t border-gray-200 mt-2">
                 <AuthButton />

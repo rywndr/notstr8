@@ -54,6 +54,9 @@ export default function AuthButton() {
     );
   }
 
+  // Extract user name from user metadata or email
+  const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || "User";
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -76,7 +79,7 @@ export default function AuthButton() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900 truncate">
-                  {user.name || "User"}
+                  {userName}
                 </div>
                 <div className="text-xs text-gray-500 truncate">
                   {user.email}
