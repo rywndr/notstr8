@@ -1,25 +1,22 @@
 'use client';
 
-import { CommunityMember } from '../../../prisma/app/generated/prisma';
-import { MemberSection } from './MemberSection';
 import { useState, useEffect } from 'react';
-import { formatDate, formatDateTime, getBadgeColor, formatDisplayValue } from '@/utils/formHandlers';
-import {
-  User, Phone, MapPin, Users,
-  IdCard, TrendingUp, Award, Shield, Heart,
-  AlertTriangle, HandHeart, Calendar, ExternalLink,
-  ChevronDown, ChevronUp, Briefcase, BookOpen,
-  Edit3, Trash2, MoreVertical
-} from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
+import { CommunityMember, SocialSecurityType, DiscriminationPerpetrator } from '../../../prisma/app/generated/prisma';
 import { DeleteModal } from './DeleteModal';
+import { MemberSection } from './MemberSection';
+import { 
+  User, Phone, MapPin, Users, MoreVertical, Edit3, Trash2, 
+  IdCard, TrendingUp, Award, Shield, Heart, AlertTriangle, Users2, Accessibility, Building, FileText,
+  ChevronUp, ChevronDown, Briefcase, BookOpen, Calendar
+} from 'lucide-react';
 import Link from 'next/link';
+import { LucideIcon } from 'lucide-react';
+import { formatDate, formatDateTime, formatDisplayValue, getBadgeColor } from '@/utils/formHandlers';
 
 interface MemberCardProps {
   member: CommunityMember;
-  index: number;
-  currentPage: number;
-  pageSize: number;
+  onDelete?: (id: string) => void;
+  isUserView?: boolean; // To hide admin actions for user's own card view
 }
 
 const styles = {
@@ -35,15 +32,14 @@ const styles = {
   statBadge: "px-2 py-1 rounded-md text-xs font-medium",
 };
 
-export function MemberCard({ member}: MemberCardProps) {
+export function MemberCard({ member, onDelete, isUserView }: MemberCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
+
+  const toggleExpand = () => setIsExpanded(!isExpanded);
 
   const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
 
@@ -74,7 +70,7 @@ export function MemberCard({ member}: MemberCardProps) {
             <div className="flex items-center gap-2">
               
               <button
-                onClick={() => setIsExpanded(!isExpanded)}
+                onClick={toggleExpand}
                 className={styles.toggleBtn}
               >
                 {isExpanded ? 'Tutup' : 'Detail'}
@@ -89,7 +85,7 @@ export function MemberCard({ member}: MemberCardProps) {
                   <MoreVertical size={16} className="text-slate-600" />
                 </button>
                 
-                {showActions && (
+                {showActions && !isUserView && (
                   <div className="absolute right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[120px]">
                     <Link
                       href={`/admin/edit/${member.id}`}
@@ -98,6 +94,14 @@ export function MemberCard({ member}: MemberCardProps) {
                     >
                       <Edit3 size={14} />
                       Edit
+                    </Link>
+                    <Link
+                      href={`/admin/history/${member.id}`}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 text-slate-700"
+                      onClick={() => setShowActions(false)}
+                    >
+                      <Calendar size={14} />
+                      Riwayat
                     </Link>
                     <button
                       onClick={() => {
@@ -173,9 +177,9 @@ export function MemberCard({ member}: MemberCardProps) {
                 </p>
               </div>
               <div>
-                <p className="text-slate-500 text-xs pb-1">Status BPJS</p>
-                <p className={`font-medium text-xs px-2 py-1 rounded ${member.hasBpjs ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {member.hasBpjs ? 'MEMILIKI' : 'TIDAK MEMILIKI'}
+                <p className="text-slate-500 text-xs pb-1">Jaminan Sosial</p>
+                <p className={`font-medium text-xs px-2 py-1 rounded ${member.socialSecurityType && member.socialSecurityType !== 'NONE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {member.socialSecurityType && member.socialSecurityType !== 'NONE' ? 'MEMILIKI' : 'TIDAK MEMILIKI'}
                 </p>
               </div>
               <div>
@@ -218,7 +222,7 @@ export function MemberCard({ member}: MemberCardProps) {
             {/* basic info grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               <InfoCard icon={User} title="Informasi Pribadi" color="text-gray-600">
-                <BasicInfo member={member} />
+                <BasicInfo member={member} mounted={mounted} />
               </InfoCard>
               <InfoCard icon={Phone} title="Kontak & Status" color="text-gray-600">
                 <ContactInfo member={member} />
@@ -243,19 +247,23 @@ export function MemberCard({ member}: MemberCardProps) {
                 <TrainingData member={member} />
               </MemberSection>
 
-              <MemberSection title="Informasi BPJS" icon={Shield}>
-                <BpjsData member={member} />
+              <MemberSection title="Informasi Jaminan Sosial" icon={Shield}> {/* Renamed */}
+                <SocialSecurityData member={member} /> {/* Renamed */}
               </MemberSection>
 
               <MemberSection title="Data Kesehatan" icon={Heart}>
                 <HealthData member={member} />
               </MemberSection>
 
-              <MemberSection title="Pengalaman Diskriminasi/Kekerasan" icon={AlertTriangle}>
+              <MemberSection title="Penyandang Disabilitas" icon={Accessibility}>
+                <DisabilityData member={member} />
+              </MemberSection>
+              
+              <MemberSection title="Pengalaman Diskriminasi" icon={AlertTriangle}>
                 <DiscriminationData member={member} />
               </MemberSection>
 
-              <MemberSection title="Bantuan Sosial & Komunitas" icon={HandHeart}>
+              <MemberSection title="Bantuan Sosial & Komunitas" icon={Users2}>
                 <SocialAssistanceData member={member} />
               </MemberSection>
             </div>
@@ -287,6 +295,12 @@ export function MemberCard({ member}: MemberCardProps) {
         onClose={() => setShowDeleteModal(false)}
         memberName={fullName}
         memberId={member.id}
+        onDelete={(id) => {
+          onDelete?.(id);
+          if (typeof window !== 'undefined') {
+            window.location.reload();
+          }
+        }}
       />
 
       {/* click outside to close actions */}
@@ -318,227 +332,193 @@ function InfoCard({ icon: Icon, title, color, children }: {
   );
 }
 
-function DataField({ label, value, className = "" }: { label: string; value: string | null | undefined; className?: string }) {
+function DataField({ label, value, className = "" }: { label: string; value: string | number | null | undefined; className?: string }) {
   return (
-    <div className={`${styles.text} ${className} flex flex-col sm:flex-row sm:justify-between gap-1`}>
-      <span className="font-medium text-slate-700 text-sm">{label}:</span>
-      <span className="text-slate-600 text-sm">{value || '-'}</span>
+    <div className={`mb-2 ${className}`}>
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className="text-sm text-slate-800 font-medium">{value || '-'}</p>
     </div>
   );
 }
 
-function BooleanField({ label, value, className = "" }: { label: string; value: boolean | null; className?: string }) {
-  const displayValue = formatDisplayValue(value);
-  const colorClass = value === true ? 'text-green-600' : value === false ? 'text-red-500' : 'text-slate-600';
-  
+function BooleanField({ label, value, className = "" }: { label: string; value: boolean | null | undefined; className?: string }) {
   return (
-    <div className={`${styles.text} ${className} flex flex-col sm:flex-row sm:justify-between gap-1`}>
-      <span className="font-medium text-slate-700 text-sm">{label}:</span>
-      <span className={`text-sm font-medium ${colorClass}`}>{displayValue}</span>
+    <div className={`mb-2 ${className}`}>
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className={`text-sm font-medium px-2 py-0.5 rounded inline-block ${
+        value === null || value === undefined 
+          ? 'bg-slate-100 text-slate-600' 
+          : value 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+      }`}>
+        {formatDisplayValue(value)}
+      </p>
     </div>
   );
 }
 
-function FileLink({ label, url }: { label: string; url: string | null }) {
-  if (!url) return null;
+function FileLink({ label, url }: { label: string; url: string | null | undefined }) {
+  if (!url) {
+    return (
+      <div className="mb-2">
+        <p className="text-xs text-slate-500">{label}</p>
+        <p className="text-sm text-slate-400 italic">Tidak ada file</p>
+      </div>
+    );
+  }
   return (
-    <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
-      <span className="font-medium text-slate-700 text-sm">{label}:</span>
-      <a href={url} target="_blank" rel="noopener noreferrer" className={`${styles.fileLink} text-sm`}>
-        Lihat File <ExternalLink size={12} />
+    <div className="mb-2">
+      <p className="text-xs text-slate-500">{label}</p>
+      <a href={url} target="_blank" rel="noopener noreferrer" className={styles.fileLink}>
+        <FileText size={14} /> Lihat File
       </a>
     </div>
   );
 }
 
-function BasicInfo({ member }: { member: CommunityMember }) {
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+function BasicInfo({ member, mounted }: { member: CommunityMember, mounted: boolean }) {
   return (
-    <div>
+    <>
       <DataField label="Nama Panggilan Komunitas" value={member.communityNickname} />
-      <DataField 
-        label="Tempat, Tanggal Lahir" 
-        value={`${member.placeOfBirth || '-'}, ${formatDate(member.dateOfBirth, mounted)}`} 
-      />
-      <DataField label="Usia" value={member.age ? `${member.age} tahun` : null} />
-      <DataField label="Jenis Kelamin" value={member.gender} />
-      <DataField label="Identitas Gender" value={member.genderIdentity} />
-    </div>
+      <DataField label="Tempat Lahir" value={member.placeOfBirth} />
+      <DataField label="Tanggal Lahir" value={formatDate(member.dateOfBirth, mounted)} />
+      <DataField label="Usia" value={member.age?.toString()} />
+      <DataField label="Jenis Kelamin" value={member.gender?.replace(/_/g, ' ')} />
+      <DataField label="Identitas Gender" value={member.genderIdentity?.replace(/_/g, ' ')} />
+    </>
   );
 }
 
 function ContactInfo({ member }: { member: CommunityMember }) {
   return (
-    <div>
-      <DataField label="Kontak" value={member.phoneNumber} />
-      <DataField label="Status Perkawinan" value={member.maritalStatus} />
-      <DataField label="Pendidikan Terakhir" value={member.lastEducation} />
-      <DataField label="Status Pekerjaan" value={member.employmentStatus} />
-      <DataField label="Kelompok Komunitas" value={member.communityGroup} />
-    </div>
+    <>
+      <DataField label="Nomor Telepon" value={member.phoneNumber} />
+    </>
   );
 }
 
 function PopulationData({ member }: { member: CommunityMember }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-      <div>
-        <DataField label="NIK" value={member.nik} />
-        <DataField label="No. KK" value={member.familyCardNumber} />
-        <DataField label="Status E-KTP" value={member.ektpStatus} />
-        {member.ektpStatus && 
-          <div className={`mt-1 px-2 py-1 rounded text-xs font-medium inline-block ${
-            member.ektpStatus === 'MEMILIKI' 
-              ? 'bg-green-100 text-green-800 border border-green-200' 
-              : member.ektpStatus === 'TIDAK_MEMILIKI'
-                ? 'bg-red-100 text-red-800 border border-red-200'
-                : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-          }`}>
-            {member.ektpStatus}
-          </div>
-        }
-      </div>
-      <div>
-        <FileLink label="Pindaian KTP" url={member.idScanUrl} />
-        {member.idScanUrl && 
-          <div className="mt-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-md text-xs text-blue-700 inline-flex items-center">
-            <IdCard className="mr-1.5 text-blue-500" size={14} />
-            Dokumen tersedia
-          </div>
-        }
-      </div>
-    </div>
+    <>
+      <DataField label="NIK" value={member.nik} />
+      <DataField label="Nomor KK" value={member.familyCardNumber} />
+      <DataField label="Status E-KTP" value={member.ektpStatus?.replace(/_/g, ' ')} />
+      <FileLink label="Pindaian KTP" url={member.idScanUrl} />
+    </>
   );
 }
 
 function AddressData({ member }: { member: CommunityMember }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-      <div>
-        <DataField label="Alamat Lengkap" value={member.address} />
-        <DataField label="Kelurahan" value={member.domicileKelurahan} />
-        <DataField label="Kecamatan" value={member.domicileKecamatan} />
-      </div>
-      <div>
-        <DataField label="Kabupaten/Kota" value={member.domicileRegencyCity} />
-        <DataField label="Status Kependudukan" value={member.residencyStatus} />
-        <DataField label="Status Tempat Tinggal" value={member.livingSituation} />
-        {member.livingSituation && 
-          <div className={`mt-1 px-2 py-1 rounded text-xs font-medium inline-block ${
-            member.livingSituation === 'RUMAH_PRIBADI' 
-              ? 'bg-green-100 text-green-800 border border-green-200' 
-              : member.livingSituation === 'BERSAMA_ORANG_TUA'
-                ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                : 'bg-orange-100 text-orange-800 border border-orange-200'
-          }`}>
-            {member.livingSituation}
-          </div>
-        }
-      </div>
-    </div>
+    <>
+      <DataField label="Alamat Lengkap" value={member.address} />
+      <DataField label="Kelurahan Domisili" value={member.domicileKelurahan} />
+      <DataField label="Kecamatan Domisili" value={member.domicileKecamatan} />
+      <DataField label="Kab/Kota Domisili" value={member.domicileRegencyCity} />
+      <DataField label="Kota" value={member.city} />
+      <DataField label="Status Kependudukan" value={member.residencyStatus?.replace(/_/g, ' ')} />
+      <DataField label="Status Tempat Tinggal" value={member.livingSituation?.replace(/_/g, ' ')} />
+    </>
   );
 }
 
 function SocialEconomicData({ member }: { member: CommunityMember }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-      <div>
-        <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
-          <span className="font-medium text-slate-700 text-sm">Masih Sekolah/Kuliah:</span>
-          <span className={`text-sm font-medium px-2 py-0.5 rounded ${
-            member.isStillStudying === null 
-              ? 'bg-slate-100 text-slate-600' 
-              : member.isStillStudying 
-                ? 'bg-cyan-100 text-cyan-800' 
-                : 'bg-amber-100 text-amber-800'
-          }`}>
-            {member.isStillStudying === null ? '-' : member.isStillStudying ? 'Ya' : 'Tidak'}
-          </span>
-        </div>
-        <DataField label="Pendapatan Bulanan" value={member.monthlyIncome ? `Rp ${member.monthlyIncome}` : null} />
-        {member.monthlyIncome && 
-          <div className="mt-1 px-2 py-1 bg-emerald-50 border border-emerald-100 rounded text-xs text-emerald-700 inline-block">
-            Rp {member.monthlyIncome}
-          </div>
-        }
-      </div>
-      <div>
-        <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
-          <span className="font-medium text-slate-700 text-sm">Kepemilikan Usaha:</span>
-          <span className={`text-sm font-medium px-2 py-0.5 rounded ${
-            member.hasOwnBusiness === null 
-              ? 'bg-slate-100 text-slate-600' 
-              : member.hasOwnBusiness 
-                ? 'bg-emerald-100 text-emerald-800' 
-                : 'bg-slate-100 text-slate-700'
-          }`}>
-            {member.hasOwnBusiness === null ? '-' : member.hasOwnBusiness ? 'Ya' : 'Tidak'}
-          </span>
-        </div>
-      </div>
-    </div>
+    <>
+      <DataField label="Status Perkawinan" value={member.maritalStatus?.replace(/_/g, ' ')} />
+      <DataField label="Pendidikan Terakhir" value={member.lastEducation?.replace(/_/g, ' ')} />
+      <BooleanField label="Masih Sekolah/Kuliah" value={member.isStillStudying} />
+      <DataField label="Status Pekerjaan" value={member.employmentStatus?.replace(/_/g, ' ')} />
+      {member.employmentStatus === "BEKERJA" && <DataField label="Jenis Pekerjaan" value={member.jobDescription} />}
+      <DataField label="Pendapatan Bulanan" value={member.monthlyIncome ? `Rp ${member.monthlyIncome}` : '-'} />
+      <BooleanField label="Memiliki Usaha Sendiri" value={member.hasOwnBusiness} />
+      {member.hasOwnBusiness && <DataField label="Detail Usaha" value={member.businessDetails} />}
+    </>
   );
 }
 
 function TrainingData({ member }: { member: CommunityMember }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-      <div>
-        <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
-          <span className="font-medium text-slate-700 text-sm">Pelatihan Keterampilan:</span>
-          <span className={`text-sm font-medium px-2 py-0.5 rounded ${
-            member.hasReceivedSkillTraining === null 
-              ? 'bg-slate-100 text-slate-600' 
-              : member.hasReceivedSkillTraining 
-                ? 'bg-indigo-100 text-indigo-800' 
-                : 'bg-amber-100 text-amber-800'
-          }`}>
-            {member.hasReceivedSkillTraining === null ? '-' : member.hasReceivedSkillTraining ? 'Ya' : 'Tidak'}
-          </span>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+        <div>
+          <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
+            <span className="font-medium text-slate-700 text-sm">Pelatihan Keterampilan:</span>
+            <span className={`text-sm font-medium px-2 py-0.5 rounded ${
+              member.hasReceivedSkillTraining === null 
+                ? 'bg-slate-100 text-slate-600' 
+                : member.hasReceivedSkillTraining 
+                  ? 'bg-indigo-100 text-indigo-800' 
+                  : 'bg-amber-100 text-amber-800'
+            }`}>
+              {formatDisplayValue(member.hasReceivedSkillTraining)}
+            </span>
+          </div>
+          <DataField label="Jenis Pelatihan Diikuti" value={member.skillTrainingTypes?.length ? member.skillTrainingTypes.join(', ') : '-'} />
+          {member.skillTrainingTypes && member.skillTrainingTypes.length > 0 && 
+            <div className="mt-1 flex flex-wrap gap-1">
+              {member.skillTrainingTypes.map((training, index) => (
+                <div key={index} className="px-2 py-1 bg-indigo-50 border border-indigo-100 rounded text-xs text-indigo-700 inline-block">
+                  <Award size={12} className="inline mr-1" />{training}
+                </div>
+              ))}
+            </div>
+          }
         </div>
-        <DataField label="Jenis Pelatihan Diikuti" value={member.skillTrainingType} />
-        {member.skillTrainingType && 
-          <div className="mt-1 px-2 py-1 bg-indigo-50 border border-indigo-100 rounded text-xs text-indigo-700 inline-block">
-            {member.skillTrainingType}
-          </div>
-        }
+        <div>
+          <DataField label="Penyelenggara Pelatihan" value={member.trainingOrganizers?.length ? member.trainingOrganizers.join(', ') : '-'} />
+          {member.trainingOrganizers && member.trainingOrganizers.length > 0 &&
+            <div className="mt-1 flex flex-wrap gap-1">
+              {member.trainingOrganizers.map((organizer, index) => (
+                <div key={index} className="px-2 py-1 bg-purple-50 border border-purple-100 rounded text-xs text-purple-700 inline-block">
+                  <Building size={12} className="inline mr-1" />{organizer}
+                </div>
+              ))}
+            </div>
+          }
+          <DataField label="Pelatihan Diinginkan" value={member.desiredSkillTrainings?.length ? member.desiredSkillTrainings.join(', ') : '-'} />
+          {member.desiredSkillTrainings && member.desiredSkillTrainings.length > 0 && 
+            <div className="mt-1 flex flex-wrap gap-1">
+              {member.desiredSkillTrainings.map((training, index) => (
+                <div key={index} className="px-2 py-1 bg-violet-50 border border-violet-100 rounded text-xs text-violet-700 inline-block">
+                  {training}
+                </div>
+              ))}
+            </div>
+          }
+        </div>
       </div>
-      <div>
-        <DataField label="Pelatihan Diinginkan" value={member.desiredSkillTraining} />
-        {member.desiredSkillTraining && 
-          <div className="mt-1 px-2 py-1 bg-violet-50 border border-violet-100 rounded text-xs text-violet-700 inline-block">
-            {member.desiredSkillTraining}
-          </div>
-        }
-      </div>
-    </div>
+    </>
   );
 }
 
 // Enhance the function components for sections with vibrant colors
 
-function BpjsData({ member }: { member: CommunityMember }) {
+function SocialSecurityData({ member }: { member: CommunityMember }) { // Renamed from BpjsData
+  const socialSecurityTypeDisplay: Record<string, string> = {
+    [SocialSecurityType.NONE]: 'Tidak Memiliki',
+    [SocialSecurityType.BPJS_KESEHATAN]: 'BPJS Kesehatan',
+    [SocialSecurityType.BPJS_TK]: 'BPJS-TK',
+    [SocialSecurityType.OTHER]: 'Lainnya',
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
       <div className="space-y-3">
-        <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
-          <span className="font-medium text-slate-700 text-sm">Memiliki BPJS:</span>
-          <span className={`text-sm font-medium px-2 py-0.5 rounded ${member.hasBpjs ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
-            {member.hasBpjs ? 'Ya' : 'Tidak'}
-          </span>
-        </div>
-        {member.hasBpjs && <DataField label="ID BPJS" value={member.bpjsId} />}
+        <DataField label="Jenis Jaminan Sosial" value={member.socialSecurityType ? socialSecurityTypeDisplay[member.socialSecurityType] : '-'} />
+        {member.socialSecurityType === SocialSecurityType.OTHER && (
+          <DataField label="Nama Jaminan Lainnya" value={member.socialSecurityOther} />
+        )}
+        {(member.socialSecurityType && member.socialSecurityType !== SocialSecurityType.NONE) && (
+          <DataField label="ID Jaminan Sosial" value={member.socialSecurityId} />
+        )}
       </div>
       <div>
-        {member.hasBpjs && 
+        {(member.socialSecurityType && member.socialSecurityType !== SocialSecurityType.NONE) && 
           <div className="flex items-center gap-2">
-            <FileLink label="Pindaian BPJS" url={member.bpjsScanUrl} />
-            {member.bpjsScanUrl && <div className="w-2 h-2 rounded-full bg-emerald-500"></div>}
+            <FileLink label="Pindaian Kartu Jaminan" url={member.socialSecurityScanUrl} />
+            {member.socialSecurityScanUrl && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>}
           </div>
         }
       </div>
@@ -549,39 +529,79 @@ function BpjsData({ member }: { member: CommunityMember }) {
 function HealthData({ member }: { member: CommunityMember }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+      <DataField label="Akses Layanan Kesehatan" value={member.healthServiceAccess?.replace(/_/g, ' ')} />
+      <DataField label="Penyakit Kronis" value={member.chronicIllness} />
+    </div>
+  );
+}
+
+function DisabilityData({ member }: { member: CommunityMember }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
       <div>
-        <DataField label="Akses Layanan Kesehatan" value={member.healthServiceAccess} />
-        {member.healthServiceAccess && 
-          <div className="mt-1 px-2 py-1 bg-blue-50 border border-blue-100 rounded text-xs text-blue-700 inline-block">
-            {member.healthServiceAccess}
-          </div>
-        }
+        <BooleanField label="Penyandang Disabilitas" value={member.isPersonWithDisability} />
+        {member.isPersonWithDisability && member.disabilityTypes && member.disabilityTypes.length > 0 && (
+          <>
+            <DataField label="Jenis Disabilitas" value={member.disabilityTypes.join(', ').replace(/_/g, ' ')} />
+            <div className="mt-1 flex flex-wrap gap-1">
+              {member.disabilityTypes.map(type => (
+                <span key={type} className="px-2 py-0.5 bg-sky-100 text-sky-800 border border-sky-200 rounded text-xs">
+                  {type.replace(/_/g, ' ')}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
       </div>
       <div>
-        <DataField label="Penyakit Kronis" value={member.chronicIllness} />
-        {member.chronicIllness && 
-          <div className="mt-1 px-2 py-1 bg-amber-50 border border-amber-100 rounded text-xs text-amber-700 inline-block">
-            {member.chronicIllness}
-          </div>
-        }
+        {member.isPersonWithDisability && (
+          <DataField label="Catatan Disabilitas" value={member.disabilityNotes} />
+        )}
       </div>
     </div>
   );
 }
 
+
 function DiscriminationData({ member }: { member: CommunityMember }) {
-  const hasExperience = !!member.discriminationExperience;
+  const hasExperience = member.discriminationExperience === "PERNAH_MENGALAMI";
+  const discriminationExperienceDisplay = member.discriminationExperience?.replace(/_/g, ' ') || '-';
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
       <div>
-        <DataField label="Pengalaman Diskriminasi" value={member.discriminationExperience} />
+        <DataField label="Pengalaman Diskriminasi" value={discriminationExperienceDisplay} />
         {hasExperience && <div className="mb-2 mt-1 px-2 py-1 bg-orange-50 border border-orange-100 rounded text-xs text-orange-700 inline-block">
-          {member.discriminationExperience}
+          {discriminationExperienceDisplay}
         </div>}
         
-        <DataField label="Jenis Diskriminasi" value={member.discriminationType} />
-        <DataField label="Pelaku" value={member.discriminationPerpetrator} />
+        {hasExperience && member.discriminationTypes && member.discriminationTypes.length > 0 && (
+          <>
+            <DataField label="Jenis Diskriminasi" value={member.discriminationTypes.join(', ').replace(/_/g, ' ')} />
+            <div className="mt-1 flex flex-wrap gap-1">
+              {member.discriminationTypes.map(type => (
+                <span key={type} className="px-2 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded text-xs">
+                  {type.replace(/_/g, ' ')}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+        {hasExperience && member.discriminationPerpetrators && member.discriminationPerpetrators.length > 0 && (
+           <>
+            <DataField label="Pelaku" value={member.discriminationPerpetrators.join(', ').replace(/_/g, ' ')} />
+            <div className="mt-1 flex flex-wrap gap-1">
+              {member.discriminationPerpetrators.map(type => (
+                <span key={type} className="px-2 py-0.5 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded text-xs">
+                  {type.replace(/_/g, ' ')}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+        {hasExperience && member.discriminationPerpetrators?.includes(DiscriminationPerpetrator.OTHER) && (
+          <DataField label="Pelaku Lainnya" value={member.discriminationPerpetratorOther} />
+        )}
       </div>
       <div>
         <DataField label="Lokasi" value={member.discriminationLocation} />
@@ -604,29 +624,42 @@ function SocialAssistanceData({ member }: { member: CommunityMember }) {
         <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
           <span className="font-medium text-slate-700 text-sm">Menerima Bantuan Sosial:</span>
           <span className={`text-sm font-medium px-2 py-0.5 rounded ${
-            member.receivesSocialAssistance === null 
+            member.receivesSocialAssistance === null || member.receivesSocialAssistance === undefined
               ? 'bg-slate-100 text-slate-600' 
               : member.receivesSocialAssistance 
-                ? 'bg-emerald-100 text-emerald-800' 
+                ? 'bg-indigo-100 text-indigo-800' 
                 : 'bg-amber-100 text-amber-800'
           }`}>
-            {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Ya' : 'Tidak'}
+            {formatDisplayValue(member.receivesSocialAssistance)}
           </span>
         </div>
+        <DataField label="Kelompok Komunitas" value={member.communityGroup} />
       </div>
       <div>
         <div className={`${styles.text} flex flex-col sm:flex-row sm:justify-between gap-1`}>
           <span className="font-medium text-slate-700 text-sm">Terdaftar DTKS:</span>
           <span className={`text-sm font-medium px-2 py-0.5 rounded ${
-            member.isRegisteredInDTKS === null 
+            member.isRegisteredInDTKS === null  || member.isRegisteredInDTKS === undefined
               ? 'bg-slate-100 text-slate-600' 
               : member.isRegisteredInDTKS 
                 ? 'bg-indigo-100 text-indigo-800' 
                 : 'bg-amber-100 text-amber-800'
           }`}>
-            {member.isRegisteredInDTKS === null ? '-' : member.isRegisteredInDTKS ? 'Ya' : 'Tidak'}
+            {formatDisplayValue(member.isRegisteredInDTKS)}
           </span>
         </div>
+        {member.otherSocialAssistance && member.otherSocialAssistance.length > 0 && (
+          <div className="mt-2">
+            <DataField label="Bantuan Sosial Lainnya" value={member.otherSocialAssistance.join(', ')} />
+            <div className="mt-1 flex flex-wrap gap-1">
+              {member.otherSocialAssistance.map((item, index) => (
+                <span key={index} className="px-2 py-0.5 bg-teal-100 text-teal-800 border border-teal-200 rounded text-xs">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

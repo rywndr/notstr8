@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Users, Search } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -27,12 +26,6 @@ export function EmptyState({ hasFilters = false }: EmptyStateProps) {
           <p className="text-slate-500 mb-4">
             Data anggota komunitas akan ditampilkan di sini setelah ada yang mendaftar
           </p>
-          <Link 
-            href="/form" 
-            className="inline-block mt-6 bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-          >
-            Isi Formulir Sekarang
-          </Link>
         </>
       )}
     </div>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { User, LogOut, Edit, FileCheck } from 'lucide-react';
+import { User, LogOut, Edit, FileCheck, Inbox, Clock, X } from 'lucide-react';
 import { createClientSupabaseClient } from '@/lib/supabase/client';
 import { AuthUser } from '@/hooks/useAuth';
 
@@ -55,11 +55,21 @@ export function MobileProfileSection({ user, userName, onNavigate }: MobileProfi
                 onClick={onNavigate}
               >
                 <FileCheck className="w-3 h-3" />
-                <span>Sudah Dikirim</span>
+                <span>Terdaftar</span>
               </Link>
+            ) : user.submissionStatus === 'PENDING_REVIEW' ? (
+              <span className="inline-flex items-center space-x-1 text-xs font-medium px-2 py-1 rounded-full bg-blue-50 text-blue-700">
+                <Clock className="w-3 h-3" />
+                <span>Menunggu Verifikasi</span>
+              </span>
+            ) : user.submissionStatus === 'REJECTED' ? (
+              <span className="inline-flex items-center space-x-1 text-xs font-medium px-2 py-1 rounded-full bg-red-50 text-red-700">
+                <X className="w-3 h-3" />
+                <span>Ditolak</span>
+              </span>
             ) : (
               <span className="text-xs font-medium px-2 py-1 rounded-full bg-yellow-50 text-yellow-700">
-                Belum Dikirim
+                Belum Dikirimm
               </span>
             )}
           </div>
@@ -68,6 +78,17 @@ export function MobileProfileSection({ user, userName, onNavigate }: MobileProfi
 
       {/* Actions */}
       <div className="py-2 border-t border-gray-100 space-y-1">
+        {user.role === "ADMIN" && (
+          <Link
+            href="/admin/pending"
+            className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+            onClick={onNavigate}
+          >
+            <Inbox className="w-4 h-4" />
+            <span>Inbox</span>
+          </Link>
+        )}
+
         {user.role !== "ADMIN" && user.hasSubmittedForm && (
           <Link
             href="/form/edit"
@@ -76,6 +97,17 @@ export function MobileProfileSection({ user, userName, onNavigate }: MobileProfi
           >
             <Edit className="w-4 h-4" />
             <span>Edit Formulir</span>
+          </Link>
+        )}
+
+        {user.role !== "ADMIN" && (user.submissionStatus === 'NOT_SUBMITTED' || user.submissionStatus === 'REJECTED') && (
+          <Link
+            href="/form"
+            className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+            onClick={onNavigate}
+          >
+            <Edit className="w-4 h-4" />
+            <span>{user.submissionStatus === 'REJECTED' ? 'Kirim Ulang Formulir' : 'Isi Formulir'}</span>
           </Link>
         )}
 

@@ -21,7 +21,7 @@ declare module 'jspdf' {
 
 interface ExportButtonProps {
   searchQuery?: string;
-  bpjsStatus?: string;
+  socialSecurityTypeFilter?: string;
   socialAssistanceStatus?: string;
   educationLevel?: string;
   employmentStatus?: string;
@@ -29,7 +29,7 @@ interface ExportButtonProps {
 
 export function ExportButton({ 
   searchQuery, 
-  bpjsStatus, 
+  socialSecurityTypeFilter, 
   socialAssistanceStatus, 
   educationLevel, 
   employmentStatus 
@@ -41,50 +41,57 @@ export function ExportButton({
     const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
     
     return [
-      index + 1,
-      fullName,
-      member.communityNickname || '-',
-      member.age || '-',
-      member.gender || '-',
-      member.genderIdentity || '-',
-      member.placeOfBirth || '-',
-      member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString('id-ID') : '-',
-      member.nik || '-',
-      member.familyCardNumber || '-',
-      member.ektpStatus || '-',
-      member.phoneNumber || '-',
-      member.address || '-',
-      member.domicileKelurahan || '-',
-      member.domicileKecamatan || '-',
-      member.domicileRegencyCity || '-',
-      member.city || '-',
-      member.residencyStatus || '-',
-      member.livingSituation || '-',
-      member.maritalStatus || '-',
-      member.lastEducation || '-',
-      member.isStillStudying === null ? '-' : member.isStillStudying ? 'Ya' : 'Tidak',
-      member.employmentStatus || '-',
-      member.jobDescription || '-',
-      member.monthlyIncome || '-',
-      member.hasOwnBusiness === null ? '-' : member.hasOwnBusiness ? 'Ya' : 'Tidak',
-      member.businessDetails || '-',
-      member.hasReceivedSkillTraining === null ? '-' : member.hasReceivedSkillTraining ? 'Ya' : 'Tidak',
-      member.skillTrainingType || '-',
-      member.desiredSkillTraining || '-',
-      member.hasBpjs ? 'Ya' : 'Tidak',
-      member.bpjsId || '-',
-      member.healthServiceAccess || '-',
-      member.chronicIllness || '-',
-      member.discriminationExperience || '-',
-      member.discriminationType || '-',
-      member.discriminationPerpetrator || '-',
-      member.discriminationLocation || '-',
-      member.wasDiscriminationReported === null ? '-' : member.wasDiscriminationReported ? 'Ya' : 'Tidak',
-      member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Ya' : 'Tidak',
-      member.isRegisteredInDTKS === null ? '-' : member.isRegisteredInDTKS ? 'Ya' : 'Tidak',
-      member.communityGroup || '-',
-      new Date(member.createdAt).toLocaleDateString('id-ID'),
-      new Date(member.updatedAt).toLocaleDateString('id-ID')
+      index + 1, // No
+      fullName, // Nama Lengkap
+      member.communityNickname || '-', // Nama Panggilan
+      member.age || '-', // Umur
+      member.gender || '-', // Gender
+      member.genderIdentity || '-', // Identitas Gender
+      member.placeOfBirth || '-', // Tempat Lahir
+      member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString('id-ID') : '-', // Tanggal Lahir
+      member.nik || '-', // NIK
+      member.familyCardNumber || '-', // No. KK
+      member.ektpStatus || '-', // Status E-KTP
+      member.phoneNumber || '-', // Telepon
+      member.address || '-', // Alamat
+      member.domicileKelurahan || '-', // Kelurahan
+      member.domicileKecamatan || '-', // Kecamatan
+      member.domicileRegencyCity || '-', // Kab/Kota Domisili
+      member.city || '-', // Kota
+      member.residencyStatus || '-', // Status Domisili
+      member.livingSituation || '-', // Tempat Tinggal
+      member.maritalStatus || '-', // Status Kawin
+      member.lastEducation || '-', // Pendidikan
+      member.isStillStudying === null ? '-' : member.isStillStudying ? 'Ya' : 'Tidak', // Masih Sekolah
+      member.employmentStatus || '-', // Pekerjaan
+      member.jobDescription || '-', // Deskripsi Kerja
+      member.monthlyIncome || '-', // Pendapatan
+      member.hasOwnBusiness === null ? '-' : member.hasOwnBusiness ? 'Ya' : 'Tidak', // Punya Usaha
+      member.businessDetails || '-', // Detail Usaha
+      member.hasReceivedSkillTraining === null ? '-' : member.hasReceivedSkillTraining ? 'Ya' : 'Tidak', // Pelatihan Skill
+      member.skillTrainingTypes?.length ? member.skillTrainingTypes.join('; ') : '-', // Jenis Pelatihan
+      member.trainingOrganizers?.length ? member.trainingOrganizers.join('; ') : '-', // Penyelenggara Pelatihan
+      member.desiredSkillTrainings?.length ? member.desiredSkillTrainings.join('; ') : '-', // Pelatihan Diinginkan
+      member.socialSecurityType || '-', // Jenis Jaminan Sosial
+      member.socialSecurityOther || '-', // Jaminan Sosial Lainnya
+      member.socialSecurityId || '-', // ID Jaminan Sosial
+      member.healthServiceAccess || '-', // Akses Kesehatan
+      member.chronicIllness || '-', // Penyakit Kronis
+      member.isPersonWithDisability === null ? '-' : member.isPersonWithDisability ? 'Ya' : 'Tidak', // Penyandang Disabilitas
+      member.disabilityTypes?.join(', ') || '-', // Jenis Disabilitas
+      member.disabilityNotes || '-', // Catatan Disabilitas
+      member.discriminationExperience || '-', // Pengalaman Diskriminasi
+      member.discriminationTypes?.join(', ') || '-', // Jenis Diskriminasi
+      member.discriminationPerpetrators?.join(', ') || '-', // Pelaku Diskriminasi
+      member.discriminationPerpetratorOther || '-', // Pelaku Diskriminasi Lainnya
+      member.discriminationLocation || '-', // Lokasi Diskriminasi
+      member.wasDiscriminationReported === null ? '-' : member.wasDiscriminationReported ? 'Ya' : 'Tidak', // Diskriminasi Dilaporkan
+      member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Ya' : 'Tidak', // Terima Bansos
+      member.otherSocialAssistance?.join(', ') || '-', // Bansos Lainnya
+      member.isRegisteredInDTKS === null ? '-' : member.isRegisteredInDTKS ? 'Ya' : 'Tidak', // Terdaftar DTKS
+      member.communityGroup || '-', // Komunitas
+      new Date(member.createdAt).toLocaleDateString('id-ID'), // Tanggal Daftar
+      new Date(member.updatedAt).toLocaleDateString('id-ID') // Tanggal Update
     ];
   };
 
@@ -98,7 +105,7 @@ export function ExportButton({
       
       const result = await exportMembersToPDF(
         searchQuery,
-        bpjsStatus,
+        socialSecurityTypeFilter, // Updated
         socialAssistanceStatus,
         educationLevel,
         employmentStatus
@@ -118,7 +125,7 @@ export function ExportButton({
       doc.text(`Tanggal Export: ${new Date().toLocaleDateString('id-ID')}`, 14, 26);
       doc.text(`Total Data: ${result.members?.length || 0}`, 14, 32);
 
-      // Basic Information
+      // Page 1: Basic Information
       const basicData = result.members?.map((member: CommunityMember, index: number) => formatBasicInfo(member, index)) || [];
       doc.autoTable({
         head: [['No', 'Nama', 'Panggilan', 'Umur', 'Gender', 'Tempat Lahir', 'Tanggal Lahir', 'Telepon', 'Status Kawin']],
@@ -128,6 +135,7 @@ export function ExportButton({
         headStyles: { fillColor: [41, 128, 185] }
       });
 
+      // Page 2: Address & Identity
       doc.addPage();
       doc.setFontSize(14);
       doc.text('Data Alamat & Kependudukan', 14, 20);
@@ -141,9 +149,10 @@ export function ExportButton({
         headStyles: { fillColor: [52, 152, 219] }
       });
 
+      // Page 3: Education & Employment
       doc.addPage();
       doc.setFontSize(14);
-      doc.text('Data Sosial & Ekonomi', 14, 20);
+      doc.text('Data Pendidikan & Pekerjaan', 14, 20);
       
       const socialData = result.members?.map((member: CommunityMember) => formatSocialEconomic(member)) || [];
       doc.autoTable({
@@ -154,17 +163,74 @@ export function ExportButton({
         headStyles: { fillColor: [155, 89, 182] }
       });
 
+      // Page 4: Training Information
       doc.addPage();
       doc.setFontSize(14);
-      doc.text('Data Kesehatan & Bantuan Sosial', 14, 20);
+      doc.text('Data Pelatihan', 14, 20);
       
-      const healthData = result.members?.map((member: CommunityMember) => formatHealthBpjs(member)) || [];
+      const trainingData = result.members?.map((member: CommunityMember) => formatTrainingInfo(member)) || [];
       doc.autoTable({
-        head: [['Nama', 'BPJS', 'ID BPJS', 'Akses Kesehatan', 'Penyakit Kronis', 'Bansos', 'DTKS']],
-        body: healthData,
+        head: [['Nama', 'Pernah Pelatihan', 'Jenis Pelatihan', 'Penyelenggara', 'Pelatihan Diinginkan']],
+        body: trainingData,
+        startY: 30,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [230, 126, 34] }
+      });
+
+      // Page 5: Social Security & Health
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Data Jaminan Sosial & Kesehatan', 14, 20);
+      
+      const healthSocialSecurityData = result.members?.map((member: CommunityMember) => formatSocialSecurityHealthInfo(member)) || [];
+      doc.autoTable({
+        head: [['Nama', 'Jenis BPJS', 'ID Jaminan', 'Jaminan Lain', 'Akses Kesehatan', 'Penyakit Kronis']],
+        body: healthSocialSecurityData,
         startY: 30,
         styles: { fontSize: 8 },
         headStyles: { fillColor: [46, 204, 113] }
+      });
+
+      // Page 6: Disability Information
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Data Disabilitas', 14, 20);
+      
+      const disabilityData = result.members?.map((member: CommunityMember) => formatDisabilityInfo(member)) || [];
+      doc.autoTable({
+        head: [['Nama', 'Penyandang Disabilitas', 'Jenis Disabilitas', 'Catatan Disabilitas']],
+        body: disabilityData,
+        startY: 30,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [231, 76, 60] }
+      });
+
+      // Page 7: Discrimination Information
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Data Diskriminasi', 14, 20);
+      
+      const discriminationData = result.members?.map((member: CommunityMember) => formatDiscriminationInfo(member)) || [];
+      doc.autoTable({
+        head: [['Nama', 'Pengalaman Diskriminasi', 'Jenis Diskriminasi', 'Pelaku', 'Lokasi', 'Dilaporkan']],
+        body: discriminationData,
+        startY: 30,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [243, 156, 18] }
+      });
+
+      // Page 8: Social Assistance & Community
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Data Bantuan Sosial & Komunitas', 14, 20);
+      
+      const socialAssistanceData = result.members?.map((member: CommunityMember) => formatSocialAssistanceInfo(member)) || [];
+      doc.autoTable({
+        head: [['Nama', 'Terima Bansos', 'Bansos Lainnya', 'DTKS', 'Komunitas', 'Tgl Daftar']],
+        body: socialAssistanceData,
+        startY: 30,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [142, 68, 173] }
       });
 
       doc.save(`data-anggota-komunitas-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -186,7 +252,7 @@ export function ExportButton({
       
       const result = await exportMembersToExcel(
         searchQuery,
-        bpjsStatus,
+        socialSecurityTypeFilter,
         socialAssistanceStatus,
         educationLevel,
         employmentStatus
@@ -213,12 +279,16 @@ export function ExportButton({
       // Main Data Headers
       const mainHeaders = [
         'No', 'Nama Lengkap', 'Nama Panggilan', 'Umur', 'Gender', 'Identitas Gender', 'Tempat Lahir', 'Tanggal Lahir',
-        'NIK', 'No. KK', 'Status E-KTP', 'Telepon', 'Alamat', 'Kelurahan', 'Kecamatan', 'Kab/Kota', 'Kota',
+        'NIK', 'No. KK', 'Status E-KTP', 'Telepon', 'Alamat', 'Kelurahan', 'Kecamatan', 'Kab/Kota Domisili', 'Kota',
         'Status Domisili', 'Tempat Tinggal', 'Status Kawin', 'Pendidikan', 'Masih Sekolah', 'Pekerjaan',
-        'Deskripsi Kerja', 'Pendapatan', 'Punya Usaha', 'Detail Usaha', 'Pelatihan Skill', 'Jenis Pelatihan',
-        'Pelatihan Diinginkan', 'BPJS', 'ID BPJS', 'Akses Kesehatan', 'Penyakit Kronis', 'Pengalaman Diskriminasi',
-        'Jenis Diskriminasi', 'Pelaku', 'Lokasi Diskriminasi', 'Dilaporkan', 'Bansos', 'DTKS', 'Komunitas',
-        'Tanggal Daftar', 'Tanggal Update'
+        'Deskripsi Kerja', 'Pendapatan', 'Punya Usaha', 'Detail Usaha', 
+        'Pelatihan Diterima', 'Jenis Pelatihan', 'Penyelenggara Pelatihan', 'Pelatihan Diinginkan', 
+        'Jenis Jaminan Sosial', 'Jaminan Sosial Lainnya', 'ID Jaminan Sosial', 
+        'Akses Kesehatan', 'Penyakit Kronis', 
+        'Penyandang Disabilitas', 'Jenis Disabilitas', 'Catatan Disabilitas',
+        'Pengalaman Diskriminasi', 'Jenis Diskriminasi', 'Pelaku Diskriminasi', 'Pelaku Lainnya', 'Lokasi Diskriminasi', 'Dilaporkan', 
+        'Terima Bansos', 'Bansos Lainnya', 'DTKS', 
+        'Komunitas', 'Tanggal Daftar', 'Tanggal Update'
       ];
       
       const allDataRows = result.members?.map((member: CommunityMember, index: number) => formatAllMemberData(member, index)) || [];
@@ -322,16 +392,60 @@ export function ExportButton({
     ];
   };
 
-  const formatHealthBpjs = (member: CommunityMember): (string | number)[] => {
+  const formatSocialSecurityHealthInfo = (member: CommunityMember): (string | number)[] => { // Renamed and updated
     const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
     return [
       fullName,
-      member.hasBpjs ? 'Ya' : 'Tidak',
-      member.bpjsId || '-',
+      member.socialSecurityType || '-',
+      member.socialSecurityId || '-',
+      member.socialSecurityOther || '-',
       member.healthServiceAccess || '-',
-      member.chronicIllness || '-',
+      member.chronicIllness || '-'
+    ];
+  };
+
+  const formatTrainingInfo = (member: CommunityMember): (string | number)[] => {
+    const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
+    return [
+      fullName,
+      member.hasReceivedSkillTraining === null ? '-' : member.hasReceivedSkillTraining ? 'Ya' : 'Tidak',
+      member.skillTrainingTypes?.length ? member.skillTrainingTypes.join('; ') : '-',
+      member.trainingOrganizers?.length ? member.trainingOrganizers.join('; ') : '-',
+      member.desiredSkillTrainings?.length ? member.desiredSkillTrainings.join('; ') : '-'
+    ];
+  };
+
+  const formatDisabilityInfo = (member: CommunityMember): (string | number)[] => {
+    const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
+    return [
+      fullName,
+      member.isPersonWithDisability === null ? '-' : member.isPersonWithDisability ? 'Ya' : 'Tidak',
+      member.disabilityTypes?.join(', ') || '-',
+      member.disabilityNotes || '-'
+    ];
+  };
+
+  const formatDiscriminationInfo = (member: CommunityMember): (string | number)[] => {
+    const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
+    return [
+      fullName,
+      member.discriminationExperience || '-',
+      member.discriminationTypes?.join(', ') || '-',
+      member.discriminationPerpetrators?.join(', ') || '-',
+      member.discriminationLocation || '-',
+      member.wasDiscriminationReported === null ? '-' : member.wasDiscriminationReported ? 'Ya' : 'Tidak'
+    ];
+  };
+
+  const formatSocialAssistanceInfo = (member: CommunityMember): (string | number)[] => {
+    const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim();
+    return [
+      fullName,
       member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'Ya' : 'Tidak',
-      member.isRegisteredInDTKS === null ? '-' : member.isRegisteredInDTKS ? 'Ya' : 'Tidak'
+      member.otherSocialAssistance?.join(', ') || '-',
+      member.isRegisteredInDTKS === null ? '-' : member.isRegisteredInDTKS ? 'Ya' : 'Tidak',
+      member.communityGroup || '-',
+      new Date(member.createdAt).toLocaleDateString('id-ID')
     ];
   };
 

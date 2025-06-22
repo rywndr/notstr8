@@ -58,30 +58,31 @@ const processGenderData = (members: CommunityMember[]): PieChartData[] => {
   }))
 }
 
-// Helper function to process BPJS data
-const processBpjsData = (members: CommunityMember[]): PieChartData[] => {
-  const bpjsCounts = { memiliki: 0, tidakMemiliki: 0 }
+// Helper function to process Social Security data
+const processSocialSecurityData = (members: CommunityMember[]): PieChartData[] => {
+  const socialSecurityCounts: { [type: string]: number } = {}
 
   members.forEach((member) => {
-    if (member.hasBpjs) {
-      bpjsCounts.memiliki++
-    } else {
-      bpjsCounts.tidakMemiliki++
+    if (member.socialSecurityType) {
+      const type = member.socialSecurityType
+      socialSecurityCounts[type] = (socialSecurityCounts[type] || 0) + 1
     }
   })
 
-  return [
-    {
-      category: "Memiliki",
-      visitors: bpjsCounts.memiliki,
-      fill: "hsl(var(--chart-1))",
-    },
-    {
-      category: "Tidak Memiliki",
-      visitors: bpjsCounts.tidakMemiliki,
-      fill: "hsl(var(--chart-2))",
-    },
-  ]
+  const socialSecurityLabels: { [key: string]: string } = {
+    NONE: "Tidak Memiliki",
+    BPJS_KESEHATAN: "BPJS Kesehatan",
+    BPJS_TK: "BPJS Ketenagakerjaan",
+    OTHER: "Lainnya",
+  }
+
+  const colors = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"]
+
+  return Object.entries(socialSecurityCounts).map(([type, count], index) => ({
+    category: socialSecurityLabels[type] || type,
+    visitors: count,
+    fill: colors[index % colors.length],
+  }))
 }
 
 // Helper function to process marital status data
@@ -110,6 +111,33 @@ const processMaritalStatusData = (members: CommunityMember[]): PieChartData[] =>
   }))
 }
 
+// Helper function to process employment status data
+const processEmploymentStatusData = (members: CommunityMember[]): PieChartData[] => {
+  const employmentCounts: { [status: string]: number } = {}
+
+  members.forEach((member) => {
+    if (member.employmentStatus) {
+      const status = member.employmentStatus
+      employmentCounts[status] = (employmentCounts[status] || 0) + 1
+    }
+  })
+
+  const employmentLabels: { [key: string]: string } = {
+    BEKERJA: "Bekerja",
+    TIDAK_BEKERJA: "Tidak Bekerja",
+    PELAJAR: "Pelajar",
+    MAHASISWA: "Mahasiswa",
+  }
+
+  const colors = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"]
+
+  return Object.entries(employmentCounts).map(([status, count], index) => ({
+    category: employmentLabels[status] || status,
+    visitors: count,
+    fill: colors[index % colors.length],
+  }))
+}
+
 export function PieCh({
   members,
   title = "Grafik Lingkaran",
@@ -132,15 +160,14 @@ export function PieCh({
           wanita: { label: "Wanita", color: "hsl(var(--chart-2))" },
         }
         break
-      case "hasBpjs":
-        processedData = processBpjsData(members)
+      case "socialSecurityType":
+        processedData = processSocialSecurityData(members)
         config = {
           visitors: { label: "Anggota" },
-          memiliki: { label: "Memiliki BPJS", color: "hsl(var(--chart-1))" },
-          "tidak-memiliki": {
-            label: "Tidak Memiliki BPJS",
-            color: "hsl(var(--chart-2))",
-          },
+          "tidak-memiliki": { label: "Tidak Memiliki", color: "hsl(var(--chart-1))" },
+          "bpjs-kesehatan": { label: "BPJS Kesehatan", color: "hsl(var(--chart-2))" },
+          "bpjs-tk": { label: "BPJS Ketenagakerjaan", color: "hsl(var(--chart-3))" },
+          lainnya: { label: "Lainnya", color: "hsl(var(--chart-4))" },
         }
         break
       case "maritalStatus":
@@ -150,6 +177,16 @@ export function PieCh({
           "belum-kawin": { label: "Belum Kawin", color: "hsl(var(--chart-1))" },
           kawin: { label: "Kawin", color: "hsl(var(--chart-2))" },
           cerai: { label: "Cerai", color: "hsl(var(--chart-3))" },
+        }
+        break
+      case "employmentStatus":
+        processedData = processEmploymentStatusData(members)
+        config = {
+          visitors: { label: "Anggota" },
+          bekerja: { label: "Bekerja", color: "hsl(var(--chart-1))" },
+          "tidak-bekerja": { label: "Tidak Bekerja", color: "hsl(var(--chart-2))" },
+          pelajar: { label: "Pelajar", color: "hsl(var(--chart-3))" },
+          mahasiswa: { label: "Mahasiswa", color: "hsl(var(--chart-4))" },
         }
         break
       default:

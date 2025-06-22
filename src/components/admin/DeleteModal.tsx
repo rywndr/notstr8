@@ -11,9 +11,10 @@ interface DeleteModalProps {
   onClose: () => void;
   memberName: string;
   memberId: string;
+  onDelete?: (id: string) => void;
 }
 
-export function DeleteModal({ isOpen, onClose, memberName, memberId }: DeleteModalProps) {
+export function DeleteModal({ isOpen, onClose, memberName, memberId, onDelete }: DeleteModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -32,6 +33,9 @@ export function DeleteModal({ isOpen, onClose, memberName, memberId }: DeleteMod
           description: 'Data member telah dihapus dari database.',
         });
         onClose();
+        if (onDelete) {
+          onDelete(memberId);
+        }
       } else {
         toast.error('Gagal menghapus member', {
           description: result.error || 'Terjadi kesalahan saat menghapus data.',
@@ -49,7 +53,7 @@ export function DeleteModal({ isOpen, onClose, memberName, memberId }: DeleteMod
 
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={onClose}
     >
       <div

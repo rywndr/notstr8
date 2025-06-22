@@ -143,17 +143,25 @@ export const handleAgeChange = (
 };
 
 export const formatDate = (date: Date | string | null, mounted: boolean = true): string => {
-  if (!mounted || !date) return '-';
-  return new Date(date).toLocaleDateString('id-ID');
+  if (!mounted || !date) return mounted ? '-' : 'Loading...';
+  try {
+    return new Date(date).toLocaleDateString('id-ID');
+  } catch {
+    return 'Invalid Date';
+  }
 };
 
 export const formatDateTime = (date: Date | string | null, mounted: boolean = true): string => {
-  if (!mounted || !date) return '';
-  return new Date(date).toLocaleString('id-ID');
+  if (!mounted || !date) return mounted ? '-' : 'Loading...';
+  try {
+    return new Date(date).toLocaleString('id-ID');
+  } catch {
+    return 'Invalid Date';
+  }
 };
 
-export const formatDisplayValue = (value: boolean | null): string => {
-  return value === null ? '-' : value ? 'Ya' : 'Tidak';
+export const formatDisplayValue = (value: boolean | null | undefined): string => {
+  return value === null || value === undefined ? '-' : value ? 'Ya' : 'Tidak';
 };
 
 export const getBadgeColor = (type: string, value?: string): string => {

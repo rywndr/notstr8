@@ -32,7 +32,9 @@ export async function GET() {
       email: dbUser.email,
       name: dbUser.name,
       role: dbUser.role,
-      hasSubmittedForm: dbUser.hasSubmittedForm
+      hasSubmittedForm: dbUser.hasSubmittedForm,
+      submissionStatus: dbUser.submissionStatus,
+      hasPendingSubmission: dbUser.submissionStatus === 'PENDING_REVIEW'
     })
   } catch (error) {
     console.error('Error fetching user:', error)

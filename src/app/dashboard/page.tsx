@@ -15,15 +15,15 @@ const Dashboard = async () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 <PieCh 
                     members={members}
-                    title="Distribusi Jenis Kelamin"
-                    description="Distribusi anggota berdasarkan jenis kelamin"
-                    dataKey="gender"
+                    title="Status Pekerjaan"
+                    description="Distribusi anggota berdasarkan status pekerjaan"
+                    dataKey="employmentStatus"
                 />
                 <PieCh 
                     members={members}
-                    title="Status Kepemilikan BPJS"
-                    description="Distribusi anggota berdasarkan kepemilikan BPJS"
-                    dataKey="hasBpjs"
+                    title="Jenis BPJS"
+                    description="Distribusi anggota berdasarkan jenis BPJS yang dimiliki"
+                    dataKey="socialSecurityType"
                 />
                 <PieCh 
                     members={members}
@@ -48,16 +48,6 @@ const Dashboard = async () => {
                     dataKey="lastEducation"
                     label="Anggota"
                     color="hsl(var(--chart-2))"
-                />
-            </div>
-            <div className="w-full">
-                <AreaChartInteractive 
-                    members={members}
-                    title="Distribusi Status Pekerjaan"
-                    description="Distribusi anggota komunitas berdasarkan status pekerjaan"
-                    dataKey="employmentStatus"
-                    label="Anggota"
-                    color="hsl(var(--chart-3))"
                 />
             </div>
         </div>

@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 export interface AuthUser extends User {
   role?: string
   hasSubmittedForm?: boolean
+  hasPendingSubmission?: boolean
+  submissionStatus?: string
 }
 
 export function useAuth() {
@@ -29,7 +31,9 @@ export function useAuth() {
       return { 
         ...currentUser, 
         role: userDataFromApi.role, 
-        hasSubmittedForm: userDataFromApi.hasSubmittedForm 
+        hasSubmittedForm: userDataFromApi.hasSubmittedForm,
+        hasPendingSubmission: userDataFromApi.hasPendingSubmission,
+        submissionStatus: userDataFromApi.submissionStatus
       } as AuthUser;
     } catch (error) {
       console.error('Error fetching user role and form status:', error);

@@ -3,16 +3,18 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { 
-  Edit, Phone, Calendar, MapPin, Briefcase, GraduationCap, 
-  ChevronDown, ChevronUp, User, IdCard, TrendingUp, Award, 
-  Shield, Heart, AlertTriangle, HandHeart, Trash2
+  Edit3, Trash2, Phone, Calendar, MapPin, 
+  ChevronDown, ChevronUp, User, IdCard, TrendingUp, Award, Shield, Heart, AlertTriangle, HandHeart
 } from 'lucide-react'
-import type { CommunityMember } from '../../../prisma/app/generated/prisma'
+import { CommunityMember, SocialSecurityType } from '../../../prisma/app/generated/prisma'
 import { MemberSection } from './MemberSection'
 import { DeleteModal } from './DeleteModal'
+import { formatDate, formatDateTime, formatDisplayValue } from '@/utils/formHandlers'
 
 interface MemberTableRowProps {
   member: CommunityMember
+  onDelete?: (id: string) => void
+  onEdit?: (member: CommunityMember) => void
 }
 
 const formatPhone = (phone: string | null) => {
@@ -20,141 +22,36 @@ const formatPhone = (phone: string | null) => {
   return phone.replace('+62', '0')
 }
 
-const formatDate = (date: Date | null) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('id-ID')
-}
+const socialSecurityTypeDisplay: Record<string, string> = {
+  [SocialSecurityType.NONE]: 'Tidak Ada',
+  [SocialSecurityType.BPJS_KESEHATAN]: 'BPJS Kesehatan',
+  [SocialSecurityType.BPJS_TK]: 'BPJS-TK',
+  [SocialSecurityType.OTHER]: 'Lainnya',
+};
 
-export function MemberTableRow({ member }: MemberTableRowProps) {
+export function MemberTableRow({ member, onDelete, onEdit }: MemberTableRowProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  
-  const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim()
 
-  const getBadgeColor = (type: string, value?: string) => {
-    switch(type) {
-      case 'employment':
-        switch(value) {
-          case 'BEKERJA': return 'bg-green-100 text-green-800'
-          case 'TIDAK_BEKERJA': return 'bg-red-100 text-red-800'
-          case 'PELAJAR': return 'bg-blue-100 text-blue-800'
-          case 'MAHASISWA': return 'bg-purple-100 text-purple-800'
-          default: return 'bg-gray-100 text-gray-700'
-        }
-      case 'education':
-        switch(value) {
-          case 'SD': return 'bg-yellow-100 text-yellow-800'
-          case 'SMP': return 'bg-orange-100 text-orange-800'
-          case 'SMA_SMK': return 'bg-blue-100 text-blue-800'
-          case 'PERGURUAN_TINGGI': return 'bg-purple-100 text-purple-800'
-          case 'TIDAK_SEKOLAH': return 'bg-gray-100 text-gray-800'
-          default: return 'bg-gray-100 text-gray-700'
-        }
-      default:
-        return 'bg-gray-100 text-gray-700'
-    }
-  }
+  const fullName = `${member.firstName} ${member.middleName || ''} ${member.lastName || ''}`.trim()
 
   return (
     <>
-      <tr className="hover:bg-gray-50 transition-colors">
+      <tr className="hover:bg-slate-50 transition-colors">
         <td className="px-6 py-4 whitespace-nowrap">
-          <div>
-            <div className="text-sm font-medium text-gray-900">{fullName}</div>
-            {member.communityNickname && (
-              <div className="text-xs text-gray-500">
-                <span className="text-xs text-gray-500">alias </span>
-                &quot;{member.communityNickname}&quot;</div>
-            )}
-            <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-              <Phone className="w-3 h-3" />
-              {formatPhone(member.phoneNumber)}
-            </div>
-          </div>
+          <div className="text-sm font-medium text-slate-900">{fullName || '-'}</div>
+          <div className="text-xs text-slate-500">{member.communityNickname || member.gender?.replace(/_/g, ' ')}</div>
         </td>
-
-        <td className="px-6 py-4 whitespace-nowrap">
-          <div className="text-sm text-gray-900 flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-gray-400" />
-            {member.domicileRegencyCity || '-'}
-          </div>
-          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-            <Calendar className="w-3 h-3" />
-            {member.age ? `${member.age} tahun` : '-'}
-          </div>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{member.nik || '-'}</td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{member.phoneNumber || '-'}</td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{member.city || '-'}</td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+          {member.socialSecurityType ? socialSecurityTypeDisplay[member.socialSecurityType] : '-'}
+          {member.socialSecurityType === SocialSecurityType.OTHER && member.socialSecurityOther && ` (${member.socialSecurityOther})`}
         </td>
-
-        <td className="px-6 py-4 whitespace-nowrap">
-          <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md ${getBadgeColor('education', member.lastEducation || '')}`}>
-            <GraduationCap className="w-3 h-3" />
-            {member.lastEducation || '-'}
-          </span>
-          {member.isStillStudying && (
-            <div className="text-xs text-blue-600 mt-1">Masih bersekolah</div>
-          )}
-        </td>
-
-        <td className="px-6 py-4 whitespace-nowrap">
-          <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md ${getBadgeColor('employment', member.employmentStatus || '')}`}>
-            <Briefcase className="w-3 h-3" />
-            {member.employmentStatus || '-'}
-          </span>
-          {member.jobDescription && (
-            <div className="text-xs text-gray-500 mt-1">{member.jobDescription}</div>
-          )}
-        </td>
-
-        <td className="px-6 py-4 whitespace-nowrap">
-          <div className="space-y-1">
-            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-md ${
-              member.hasBpjs ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}>
-              BPJS: {member.hasBpjs ? 'YA' : 'TIDAK'}
-            </span>
-            <br />
-            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-md ${
-              member.receivesSocialAssistance === null 
-                ? 'bg-gray-100 text-gray-800' 
-                : member.receivesSocialAssistance 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-            }`}>
-              Bansos: {member.receivesSocialAssistance === null ? '-' : member.receivesSocialAssistance ? 'YA' : 'TIDAK'}
-            </span>
-          </div>
-        </td>
-
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          <div className="flex items-center gap-1 text-xs">
-            <Calendar className="w-3 h-3" />
-            <span className="text-gray-600">Terdaftar pada:</span>
-          </div>
-          <div className="text-xs font-medium text-gray-900">
-            {formatDate(member.createdAt)}
-          </div>
-          <div className="text-xs">
-            {new Date(member.createdAt).toLocaleTimeString('id-ID', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </div>
-          <div className="flex items-center gap-1 text-xs mt-1">
-            <Calendar className="w-3 h-3" />
-            <span className="text-gray-600">Diperbarui pada:</span>
-          </div>
-          <div className="text-xs text-gray-700">
-            {formatDate(member.updatedAt)}
-          </div>
-          <div className="text-xs">
-            {new Date(member.updatedAt).toLocaleTimeString('id-ID', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </div>
-        </td>
-
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{formatDate(member.createdAt)}</td>
         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-slate-600 hover:text-slate-900 p-1 rounded transition-colors cursor-pointer"
@@ -163,12 +60,20 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
               {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
 
-            <Link
-              href={`/admin/edit/${member.id}`}
+            <button
+              onClick={() => onEdit?.(member)}
               className="text-slate-600 hover:text-slate-900 p-1 rounded transition-colors"
               title="Edit"
             >
-              <Edit size={16} />
+              <Edit3 size={18} />
+            </button>
+
+            <Link
+              href={`/admin/history/${member.id}`}
+              className="text-slate-600 hover:text-slate-900 p-1 rounded transition-colors"
+              title="Riwayat"
+            >
+              <Calendar size={18} />
             </Link>
 
             <button
@@ -176,7 +81,7 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
               className="text-red-600 hover:text-red-900 p-1 rounded transition-colors hover:bg-red-50"
               title="Hapus"
             >
-              <Trash2 size={16} />
+              <Trash2 size={18} />
             </button>
           </div>
         </td>
@@ -223,8 +128,12 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
                   <TrainingData member={member} />
                 </MemberSection>
 
-                <MemberSection title="Informasi BPJS" icon={Shield}>
-                  <BpjsData member={member} />
+                <MemberSection title="Penyandang Disabilitas" icon={Shield}>
+                  <DisabilityData member={member} />
+                </MemberSection>
+
+                <MemberSection title="Informasi Jaminan Sosial" icon={Shield}>
+                  <SocialSecurityData member={member} />
                 </MemberSection>
 
                 <MemberSection title="Data Kesehatan" icon={Heart}>
@@ -246,13 +155,13 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
                   <div className="flex items-center gap-2 text-gray-500">
                     <Calendar size={12} />
                     <p className="text-xs">
-                      Terdaftar pada: {formatDate(member.createdAt)} {new Date(member.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      Terdaftar pada: {formatDateTime(member.createdAt)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 text-gray-500">
                     <Calendar size={12} />
                     <p className="text-xs">
-                      Diperbarui pada: {formatDate(member.updatedAt)} {new Date(member.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      Diperbarui pada: {formatDateTime(member.updatedAt)}
                     </p>
                   </div>
                 </div>
@@ -267,6 +176,12 @@ export function MemberTableRow({ member }: MemberTableRowProps) {
         onClose={() => setShowDeleteModal(false)}
         memberName={fullName}
         memberId={member.id}
+        onDelete={(id) => {
+          onDelete?.(id);
+          if (typeof window !== 'undefined') {
+            window.location.reload();
+          }
+        }}
       />
     </>
   )
@@ -281,8 +196,8 @@ function DataField({ label, value, className = "" }: { label: string; value: str
   );
 }
 
-function BooleanField({ label, value, className = "" }: { label: string; value: boolean | null; className?: string }) {
-  const displayValue = value === null ? '-' : value ? 'Ya' : 'Tidak';
+function BooleanField({ label, value, className = "" }: { label: string; value: boolean | null | undefined; className?: string }) {
+  const displayValue = formatDisplayValue(value);
   const colorClass = value === true ? 'text-green-600' : value === false ? 'text-red-500' : 'text-gray-600';
   
   return (
@@ -302,8 +217,8 @@ function BasicInfo({ member }: { member: CommunityMember }) {
         value={`${member.placeOfBirth || '-'}, ${formatDate(member.dateOfBirth)}`} 
       />
       <DataField label="Usia" value={member.age ? `${member.age} tahun` : null} />
-      <DataField label="Jenis Kelamin" value={member.gender} />
-      <DataField label="Identitas Gender" value={member.genderIdentity} />
+      <DataField label="Jenis Kelamin" value={member.gender?.replace(/_/g, ' ')} />
+      <DataField label="Identitas Gender" value={member.genderIdentity?.replace(/_/g, ' ')} />
     </div>
   );
 }
@@ -312,9 +227,9 @@ function ContactInfo({ member }: { member: CommunityMember }) {
   return (
     <div>
       <DataField label="Kontak" value={formatPhone(member.phoneNumber)} />
-      <DataField label="Status Perkawinan" value={member.maritalStatus} />
-      <DataField label="Pendidikan Terakhir" value={member.lastEducation} />
-      <DataField label="Status Pekerjaan" value={member.employmentStatus} />
+      <DataField label="Status Perkawinan" value={member.maritalStatus?.replace(/_/g, ' ')} />
+      <DataField label="Pendidikan Terakhir" value={member.lastEducation?.replace(/_/g, ' ')} />
+      <DataField label="Status Pekerjaan" value={member.employmentStatus?.replace(/_/g, ' ')} />
       <DataField label="Kelompok Komunitas" value={member.communityGroup} />
     </div>
   );
@@ -326,7 +241,7 @@ function PopulationData({ member }: { member: CommunityMember }) {
       <div>
         <DataField label="NIK" value={member.nik} />
         <DataField label="No. KK" value={member.familyCardNumber} />
-        <DataField label="Status E-KTP" value={member.ektpStatus} />
+        <DataField label="Status E-KTP" value={member.ektpStatus?.replace(/_/g, ' ')} />
       </div>
       <div>
         <DataField label="Pindaian KTP" value={member.idScanUrl ? 'Tersedia' : 'Tidak ada'} />
@@ -345,8 +260,8 @@ function AddressData({ member }: { member: CommunityMember }) {
       </div>
       <div>
         <DataField label="Kabupaten/Kota" value={member.domicileRegencyCity} />
-        <DataField label="Status Kependudukan" value={member.residencyStatus} />
-        <DataField label="Status Tempat Tinggal" value={member.livingSituation} />
+        <DataField label="Status Kependudukan" value={member.residencyStatus?.replace(/_/g, ' ')} />
+        <DataField label="Status Tempat Tinggal" value={member.livingSituation?.replace(/_/g, ' ')} />
       </div>
     </div>
   );
@@ -357,11 +272,16 @@ function SocialEconomicData({ member }: { member: CommunityMember }) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
       <div>
         <BooleanField label="Masih Sekolah/Kuliah" value={member.isStillStudying} />
+        {member.employmentStatus === "BEKERJA" && (
+          <DataField label="Jenis Pekerjaan" value={member.jobDescription} />
+        )}
         <DataField label="Pendapatan Bulanan" value={member.monthlyIncome ? `Rp ${member.monthlyIncome}` : null} />
       </div>
       <div>
         <BooleanField label="Kepemilikan Usaha" value={member.hasOwnBusiness} />
-        <DataField label="Detail Usaha" value={member.businessDetails} />
+        {member.hasOwnBusiness && (
+          <DataField label="Detail Usaha" value={member.businessDetails} />
+        )}
       </div>
     </div>
   );
@@ -372,25 +292,48 @@ function TrainingData({ member }: { member: CommunityMember }) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
       <div>
         <BooleanField label="Pelatihan Keterampilan" value={member.hasReceivedSkillTraining} />
-        <DataField label="Jenis Pelatihan Diikuti" value={member.skillTrainingType} />
+        <DataField label="Jenis Pelatihan Diikuti" value={member.skillTrainingTypes?.length ? member.skillTrainingTypes.join(', ') : '-'} />
+        <DataField label="Penyelenggara Pelatihan" value={member.trainingOrganizers?.length ? member.trainingOrganizers.join(', ') : '-'} />
       </div>
       <div>
-        <DataField label="Pelatihan Diinginkan" value={member.desiredSkillTraining} />
+        <DataField label="Pelatihan Diinginkan" value={member.desiredSkillTrainings?.length ? member.desiredSkillTrainings.join(', ') : '-'} />
       </div>
     </div>
   );
 }
 
-function BpjsData({ member }: { member: CommunityMember }) {
+function DisabilityData({ member }: { member: CommunityMember }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
       <div>
-        <BooleanField label="Memiliki BPJS" value={member.hasBpjs} />
-        {member.hasBpjs && <DataField label="ID BPJS" value={member.bpjsId} />}
+        <BooleanField label="Penyandang Disabilitas" value={member.isPersonWithDisability} />
+        {member.isPersonWithDisability && member.disabilityTypes && member.disabilityTypes.length > 0 && (
+          <DataField label="Jenis Disabilitas" value={member.disabilityTypes.join(', ').replace(/_/g, ' ')} />
+        )}
       </div>
       <div>
-        {member.hasBpjs && (
-          <DataField label="Pindaian BPJS" value={member.bpjsScanUrl ? 'Tersedia' : 'Tidak ada'} />
+        {member.isPersonWithDisability && (
+          <DataField label="Catatan Disabilitas" value={member.disabilityNotes} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SocialSecurityData({ member }: { member: CommunityMember }) {
+  const hasSocialSecurity = member.socialSecurityType && member.socialSecurityType !== SocialSecurityType.NONE;
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+      <div>
+        <DataField label="Jenis Jaminan Sosial" value={member.socialSecurityType ? socialSecurityTypeDisplay[member.socialSecurityType] : '-'} />
+        {member.socialSecurityType === SocialSecurityType.OTHER && (
+          <DataField label="Lainnya" value={member.socialSecurityOther} />
+        )}
+        {hasSocialSecurity && <DataField label="Nomor Jaminan Sosial" value={member.socialSecurityId} />}
+      </div>
+      <div>
+        {hasSocialSecurity && (
+          <DataField label="Pindaian Kartu" value={member.socialSecurityScanUrl ? 'Tersedia' : 'Tidak ada'} />
         )}
       </div>
     </div>
@@ -401,7 +344,7 @@ function HealthData({ member }: { member: CommunityMember }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
       <div>
-        <DataField label="Akses Layanan Kesehatan" value={member.healthServiceAccess} />
+        <DataField label="Akses Layanan Kesehatan" value={member.healthServiceAccess?.replace(/_/g, ' ')} />
       </div>
       <div>
         <DataField label="Penyakit Kronis" value={member.chronicIllness} />
@@ -411,16 +354,26 @@ function HealthData({ member }: { member: CommunityMember }) {
 }
 
 function DiscriminationData({ member }: { member: CommunityMember }) {
+  const hasExperience = member.discriminationExperience === "PERNAH_MENGALAMI";
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
       <div>
-        <DataField label="Pengalaman Diskriminasi" value={member.discriminationExperience} />
-        <DataField label="Jenis Diskriminasi" value={member.discriminationType} />
-        <DataField label="Pelaku" value={member.discriminationPerpetrator} />
+        <DataField label="Pengalaman Diskriminasi" value={member.discriminationExperience?.replace(/_/g, ' ')} />
+        {hasExperience && (
+          <>
+            <DataField label="Jenis Diskriminasi" value={member.discriminationTypes?.length ? member.discriminationTypes.join(', ').replace(/_/g, ' ') : '-'} />
+            <DataField label="Pelaku" value={member.discriminationPerpetrators?.length ? member.discriminationPerpetrators.join(', ').replace(/_/g, ' ') : '-'} />
+          </>
+        )}
       </div>
       <div>
-        <DataField label="Lokasi" value={member.discriminationLocation} />
-        <BooleanField label="Dilaporkan" value={member.wasDiscriminationReported} />
+        {hasExperience && (
+          <>
+            <DataField label="Lokasi" value={member.discriminationLocation} />
+            <BooleanField label="Dilaporkan" value={member.wasDiscriminationReported} />
+          </>
+        )}
       </div>
     </div>
   );
@@ -431,6 +384,9 @@ function SocialAssistanceData({ member }: { member: CommunityMember }) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
       <div>
         <BooleanField label="Menerima Bantuan Sosial" value={member.receivesSocialAssistance} />
+        {member.otherSocialAssistance && member.otherSocialAssistance.length > 0 && (
+          <DataField label="Bantuan Sosial Lainnya" value={member.otherSocialAssistance.join(', ')} />
+        )}
       </div>
       <div>
         <BooleanField label="Terdaftar DTKS" value={member.isRegisteredInDTKS} />

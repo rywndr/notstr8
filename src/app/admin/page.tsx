@@ -20,7 +20,7 @@ interface AdminPageProps {
     page?: string;
     pageSize?: string;
     search?: string;
-    bpjs?: string;
+    socialSecurity?: string;
     social?: string;
     education?: string;
     employment?: string;
@@ -51,7 +51,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const currentPage = Number(params?.page) || 1;
   const pageSize = Number(params?.pageSize) || 10;
   const searchQuery = params?.search || '';
-  const bpjsStatus = params?.bpjs || 'all';
+  const socialSecurityType = params?.socialSecurity || 'all';
   const socialAssistanceStatus = params?.social || 'all';
   const educationLevel = params?.education || 'all';
   const employmentStatus = params?.employment || 'all';
@@ -60,7 +60,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     currentPage, 
     pageSize,
     searchQuery,
-    bpjsStatus,
+    socialSecurityType,
     socialAssistanceStatus,
     educationLevel,
     employmentStatus
@@ -68,7 +68,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const hasFilters = searchQuery !== '' || bpjsStatus !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all';
+  const hasFilters = searchQuery !== '' || socialSecurityType !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all';
 
   return (
     <div className="min-h-screen py-10">
@@ -77,7 +77,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         
         <FilterControls 
           initialSearchQuery={searchQuery}
-          initialBpjsStatus={bpjsStatus}
+          initialSocialSecurityType={socialSecurityType}
           initialSocialAssistanceStatus={socialAssistanceStatus}
           initialEducationLevel={educationLevel}
           initialEmploymentStatus={employmentStatus}
@@ -85,7 +85,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         <section className="w-full">
           {members.length === 0 ? (
-            <EmptyState hasFilters={searchQuery !== '' || bpjsStatus !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all'} />
+            <EmptyState hasFilters={searchQuery !== '' || socialSecurityType !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all'} />
           ) : (
             <Tabs defaultValue="grid" className="w-full">
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
@@ -108,7 +108,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                       <PageSizeSelector currentPageSize={pageSize} />
                       <ExportButton 
                       searchQuery={searchQuery}
-                      bpjsStatus={bpjsStatus}
                       socialAssistanceStatus={socialAssistanceStatus}
                       educationLevel={educationLevel}
                       employmentStatus={employmentStatus}
@@ -128,9 +127,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     >
                       <MemberCard
                         member={member}
-                        index={index}
-                        currentPage={currentPage}
-                        pageSize={pageSize}
                       />
                     </div>
                   ))}
@@ -139,7 +135,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               
               <TabsContent value="table" className="transition-all duration-500 ease-in-out animate-in fade-in-0 slide-in-from-bottom-2">
                 <div className="animate-in fade-in-0 slide-in-from-right-4 duration-500">
-                  <MemberTable members={members} />
+                  <MemberTable 
+                    members={members} 
+                  />
                 </div>
               </TabsContent>
             </Tabs>

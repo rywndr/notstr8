@@ -7,7 +7,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 
 interface FilterControlsProps {
   initialSearchQuery: string
-  initialBpjsStatus: string
+  initialSocialSecurityType: string
   initialSocialAssistanceStatus: string
   initialEducationLevel: string
   initialEmploymentStatus: string
@@ -15,7 +15,7 @@ interface FilterControlsProps {
 
 export function FilterControls({
   initialSearchQuery,
-  initialBpjsStatus,
+  initialSocialSecurityType,
   initialSocialAssistanceStatus,
   initialEducationLevel,
   initialEmploymentStatus
@@ -24,7 +24,7 @@ export function FilterControls({
   const searchParams = useSearchParams()
   
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
-  const [bpjsStatus, setBpjsStatus] = useState(initialBpjsStatus)
+  const [socialSecurityType, setSocialSecurityType] = useState(initialSocialSecurityType)
   const [socialAssistanceStatus, setSocialAssistanceStatus] = useState(initialSocialAssistanceStatus)
   const [educationLevel, setEducationLevel] = useState(initialEducationLevel)
   const [employmentStatus, setEmploymentStatus] = useState(initialEmploymentStatus)
@@ -40,10 +40,10 @@ export function FilterControls({
       params.delete('search')
     }
     
-    if (bpjsStatus !== 'all') {
-      params.set('bpjs', bpjsStatus)
+    if (socialSecurityType !== 'all') {
+      params.set('socialSecurity', socialSecurityType)
     } else {
-      params.delete('bpjs')
+      params.delete('socialSecurity')
     }
     
     if (socialAssistanceStatus !== 'all') {
@@ -66,7 +66,7 @@ export function FilterControls({
     
     params.set('page', '1') // Reset to first page
     router.push(`/admin?${params.toString()}`)
-  }, [debouncedSearchQuery, bpjsStatus, socialAssistanceStatus, educationLevel, employmentStatus, router, searchParams])
+  }, [debouncedSearchQuery, socialSecurityType, socialAssistanceStatus, educationLevel, employmentStatus, router, searchParams])
 
   useEffect(() => {
     applyFilters()
@@ -77,20 +77,34 @@ export function FilterControls({
   }
 
   const clearDropdownFilters = () => {
-    setBpjsStatus('all')
+    setSocialSecurityType('all')
     setSocialAssistanceStatus('all')
     setEducationLevel('all')
     setEmploymentStatus('all')
   }
 
-  const hasActiveDropdownFilters = bpjsStatus !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all'
+  const hasActiveDropdownFilters = socialSecurityType !== 'all' || socialAssistanceStatus !== 'all' || educationLevel !== 'all' || employmentStatus !== 'all'
 
   const getFilterLabel = (type: string, value: string) => {
     switch (type) {
-      case 'bpjs':
-        return value === 'true' ? 'Memiliki BPJS' : 'Tidak Memiliki BPJS'
+      case 'socialSecurity':
+        const socialSecurityLabels: { [key: string]: string } = {
+          'BPJS_KESEHATAN': 'BPJS Kesehatan',
+          'BPJS_TK': 'BPJS Tenaga Kerja',
+          'OTHER': 'Lainnya',
+          'NONE': 'Tidak Ada'
+        }
+        return socialSecurityLabels[value] || value
       case 'social':
-        return value === 'true' ? 'Menerima Bantuan' : 'Tidak Menerima Bantuan'
+        const socialLabels: { [key: string]: string } = {
+          'government': 'Bantuan Pemerintah',
+          'other': 'Bantuan Lainnya',
+          'any': 'Menerima Bantuan',
+          'none': 'Tidak Menerima',
+          'true': 'Menerima Bantuan', // backwards compatibility
+          'false': 'Tidak Menerima' // backwards compatibility
+        }
+        return socialLabels[value] || value
       case 'education':
         const educationLabels: { [key: string]: string } = {
           'SD': 'SD',
@@ -144,15 +158,17 @@ export function FilterControls({
         {/* Filter Dropdowns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status BPJS</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Jaminan Sosial</label>
             <select
-              value={bpjsStatus}
-              onChange={(e) => setBpjsStatus(e.target.value)}
+              value={socialSecurityType}
+              onChange={(e) => setSocialSecurityType(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm"
             >
               <option value="all">Semua</option>
-              <option value="true">Memiliki BPJS</option>
-              <option value="false">Tidak Memiliki BPJS</option>
+              <option value="BPJS_KESEHATAN">BPJS Kesehatan</option>
+              <option value="BPJS_TK">BPJS Tenaga Kerja</option>
+              <option value="OTHER">Lainnya</option>
+              <option value="NONE">Tidak Ada</option>
             </select>
           </div>
 
@@ -164,8 +180,10 @@ export function FilterControls({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm"
             >
               <option value="all">Semua</option>
-              <option value="true">Menerima</option>
-              <option value="false">Tidak Menerima</option>
+              <option value="government">Bantuan Pemerintah</option>
+              <option value="other">Bantuan Lainnya</option>
+              <option value="any">Menerima Bantuan</option>
+              <option value="none">Tidak Menerima</option>
             </select>
           </div>
 
@@ -218,9 +236,9 @@ export function FilterControls({
               </span>
             )}
             
-            {bpjsStatus !== 'all' && (
+            {socialSecurityType !== 'all' && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-md">
-                BPJS: {getFilterLabel('bpjs', bpjsStatus)}
+                Jaminan Sosial: {getFilterLabel('socialSecurity', socialSecurityType)}
               </span>
             )}
             

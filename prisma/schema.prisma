@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "./app/generated/prisma"
@@ -39,6 +33,36 @@ enum EKTPStatus {
   MEMILIKI
   TIDAK_MEMILIKI
   DALAM_PROSES
+}
+
+enum SocialSecurityType {
+  NONE
+  BPJS_KESEHATAN
+  BPJS_TK
+  OTHER
+}
+
+enum DisabilityType {
+  PHYSICAL
+  INTELLECTUAL
+  MENTAL
+  SENSORY
+}
+
+enum DiscriminationType {
+  PHYSICAL
+  ECONOMIC
+  VERBAL
+  SEXUAL
+  PSYCHOLOGICAL
+  SOCIAL
+}
+
+enum DiscriminationPerpetrator {
+  FAMILY_RELATIVE
+  COLLEAGUE
+  CUSTOMER_GUEST
+  OTHER
 }
 
 enum EducationLevel {
@@ -79,92 +103,194 @@ enum UserRole {
   ADMIN
 }
 
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum UserSubmissionStatus {
+  NOT_SUBMITTED
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  role      UserRole @default(USER)
-  supabaseId String  @unique
-  hasSubmittedForm Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relationship to community member form submission
-  communityMember CommunityMember?
+  id               String               @id @default(cuid())
+  email            String               @unique
+  name             String?
+  role             UserRole             @default(USER)
+  supabaseId       String               @unique
+  hasSubmittedForm Boolean              @default(false)
+  submissionStatus UserSubmissionStatus @default(NOT_SUBMITTED)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  communityMember  CommunityMember?
+  changeLogs       ChangeLog[]
+  posts            Post[]
 }
 
 model CommunityMember {
-  id              String    @id @default(cuid())
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                             String                      @id @default(cuid())
+  createdAt                      DateTime                    @default(now())
+  updatedAt                      DateTime                    @updatedAt
+  firstName                      String
+  middleName                     String?
+  lastName                       String?
+  nik                            String?                     @unique
+  idScanUrl                      String?
+  dateOfBirth                    DateTime?
+  address                        String?
+  city                           String?
+  phoneNumber                    String?
+  age                            Int?
+  chronicIllness                 String?
+  communityGroup                 String?
+  communityNickname              String?
+  discriminationExperience       DiscriminationExperience?
+  discriminationLocation         String?
+  domicileKecamatan              String?
+  domicileKelurahan              String?
+  domicileRegencyCity            String?
+  ektpStatus                     EKTPStatus?
+  familyCardNumber               String?
+  gender                         Gender?
+  genderIdentity                 GenderIdentity?
+  hasOwnBusiness                 Boolean?
+  hasReceivedSkillTraining       Boolean?
+  healthServiceAccess            HealthServiceAccess?
+  isRegisteredInDTKS             Boolean?
+  isStillStudying                Boolean?
+  lastEducation                  EducationLevel?
+  livingSituation                LivingSituation?
+  monthlyIncome                  String?
+  placeOfBirth                   String?
+  receivesSocialAssistance       Boolean?
+  residencyStatus                ResidencyStatus?
+  wasDiscriminationReported      Boolean?
+  jobDescription                 String?
+  employmentStatus               EmploymentStatus?
+  maritalStatus                  MaritalStatus?
+  businessDetails                String?
+  userId                         String?                     @unique
+  disabilityNotes                String?
+  disabilityTypes                DisabilityType[]
+  discriminationPerpetratorOther String?
+  discriminationPerpetrators     DiscriminationPerpetrator[]
+  discriminationTypes            DiscriminationType[]
+  isPersonWithDisability         Boolean?                    @default(false)
+  otherSocialAssistance          String[]
+  socialSecurityId               String?
+  socialSecurityOther            String?
+  socialSecurityScanUrl          String?
+  socialSecurityType             SocialSecurityType?         @default(NONE)
+  desiredSkillTrainings          String[]
+  skillTrainingTypes             String[]
+  trainingOrganizers             String[]
+  user                           User?                       @relation(fields: [userId], references: [id])
+  changeLogs                     ChangeLog[]
+}
 
-  // Data Pribadi (Personal Data)
-  firstName               String    // Nama Depan (Wajib)
-  middleName              String?   // Nama Tengah (Opsional)
-  lastName                String?   // Nama Belakang (Opsional)
-  communityNickname       String?   // Nama Alias/Panggilan Komunitas
-  placeOfBirth            String?   // Tempat Lahir
-  dateOfBirth             DateTime? // Tanggal Lahir
-  age                     Int?      // Usia
-  gender                  Gender?   // Jenis Kelamin (Pria/Wanita)
-  genderIdentity          GenderIdentity? // Identitas Gender (None/Waria)
-
-  // Data Kependudukan (Residency Data)
-  nik                     String?   @unique // Nomor Induk Kependudukan (KTP)
-  idScanUrl               String?   // URL Pindaian KTP
-  familyCardNumber        String?   // Data No. KK
-  ektpStatus              EKTPStatus? // Status Kepemilikan E-KTP
+model PendingSubmission {
+  id                             String                      @id @default(cuid())
+  createdAt                      DateTime                    @default(now())
+  updatedAt                      DateTime                    @updatedAt
+  status                         SubmissionStatus            @default(PENDING)
+  reviewedAt                     DateTime?
+  reviewedBy                     String?
+  rejectionReason                String?
   
-  // Alamat Domisili (Domicile Address)
-  address                 String?   // Alamat Lengkap (Jalan, Nomor Rumah, RT/RW)
-  domicileKelurahan       String?   // Kelurahan Domisili
-  domicileKecamatan       String?   // Kecamatan Domisili
-  domicileRegencyCity     String?   // Kabupaten/Kota Domisili
-  city                    String?   // Kota (Legacy, can be phased out or used for broader region)
-  residencyStatus         ResidencyStatus? // Status Kependudukan (Pendatang/Penduduk Tetap)
-  livingSituation         LivingSituation? // Status Tempat Tinggal
-
-  // Kontak (Contact)
-  phoneNumber             String?   // Nomor Telepon Pribadi
-  serviceContactPerson    String?   // Kontak yang bisa dihubungi untuk kepentingan layanan
-
-  // Status Sosial & Ekonomi (Social & Economic Status)
-  maritalStatus           MaritalStatus?   // Status Perkawinan (Belum Kawin, Kawin, Cerai)
-  lastEducation           EducationLevel? // Pendidikan Terakhir
-  isStillStudying         Boolean?  // Masih Sekolah/Kuliah?
-  employmentStatus        EmploymentStatus?   // Status Pekerjaan (Bekerja, Tidak Bekerja, Pelajar, Mahasiswa)
-  jobDescription          String?   // Jenis Pekerjaan (hanya jika employmentStatus = BEKERJA)
-  monthlyIncome           String?   // Pendapatan Bulanan (Bisa rentang atau angka)
-  hasOwnBusiness          Boolean?  // Kepemilikan Usaha?
+  // Submitter info
+  submitterEmail                 String
+  submitterUserId                String?
   
-  // Pelatihan (Training)
-  hasReceivedSkillTraining Boolean? // Mendapatkan Pelatihan Keterampilan Usaha?
-  skillTrainingType       String?   // Jenis Pelatihan yang Pernah Diikuti
-  desiredSkillTraining    String?   // Pelatihan yang diinginkan
-  businessDetails         String?   // Detail usaha jika memiliki usaha sendiri
+  // Form data - same fields as CommunityMember
+  firstName                      String
+  middleName                     String?
+  lastName                       String?
+  nik                            String?
+  idScanUrl                      String?
+  dateOfBirth                    DateTime?
+  address                        String?
+  city                           String?
+  phoneNumber                    String?
+  age                            Int?
+  chronicIllness                 String?
+  communityGroup                 String?
+  communityNickname              String?
+  discriminationExperience       DiscriminationExperience?
+  discriminationLocation         String?
+  domicileKecamatan              String?
+  domicileKelurahan              String?
+  domicileRegencyCity            String?
+  ektpStatus                     EKTPStatus?
+  familyCardNumber               String?
+  gender                         Gender?
+  genderIdentity                 GenderIdentity?
+  hasOwnBusiness                 Boolean?
+  hasReceivedSkillTraining       Boolean?
+  healthServiceAccess            HealthServiceAccess?
+  isRegisteredInDTKS             Boolean?
+  isStillStudying                Boolean?
+  lastEducation                  EducationLevel?
+  livingSituation                LivingSituation?
+  monthlyIncome                  String?
+  placeOfBirth                   String?
+  receivesSocialAssistance       Boolean?
+  residencyStatus                ResidencyStatus?
+  wasDiscriminationReported      Boolean?
+  jobDescription                 String?
+  employmentStatus               EmploymentStatus?
+  maritalStatus                  MaritalStatus?
+  businessDetails                String?
+  disabilityNotes                String?
+  disabilityTypes                DisabilityType[]
+  discriminationPerpetratorOther String?
+  discriminationPerpetrators     DiscriminationPerpetrator[]
+  discriminationTypes            DiscriminationType[]
+  isPersonWithDisability         Boolean?                    @default(false)
+  otherSocialAssistance          String[]
+  socialSecurityId               String?
+  socialSecurityOther            String?
+  socialSecurityScanUrl          String?
+  socialSecurityType             SocialSecurityType?         @default(NONE)
+  desiredSkillTrainings          String[]
+  skillTrainingTypes             String[]
+  trainingOrganizers             String[]
+}
 
-  // Informasi BPJS (BPJS Information)
-  hasBpjs                 Boolean   @default(false) // Apakah memiliki BPJS?
-  bpjsId                  String?   @unique // Nomor BPJS
-  bpjsScanUrl             String?   // URL Pindaian Kartu BPJS
+model ChangeLog {
+  id                String                  @id @default(cuid())
+  createdAt         DateTime                @default(now())
+  memberId          String
+  changedById       String
+  changedByName     String
+  fieldName         String
+  oldValue          String?
+  newValue          String?
+  action            String                  // "CREATE", "UPDATE", "DELETE"
+  
+  member            CommunityMember         @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  changedBy         User                    @relation(fields: [changedById], references: [id])
+  
+  @@index([memberId])
+  @@index([changedById])
+}
 
-  // Data Kesehatan (Health Data)
-  healthServiceAccess     HealthServiceAccess? // Akses Layanan Kesehatan Terakhir/Rutin
-  chronicIllness          String?   // Penyakit Kronis atau kondisi kesehatan khusus
-
-  // Pengalaman Diskriminasi/Kekerasan (Discrimination/Violence Experience)
-  discriminationExperience  DiscriminationExperience? // Pernah mengalami diskriminasi atau kekerasan
-  discriminationType        String?   // Jenis diskriminasi atau kekerasan jika ada
-  discriminationPerpetrator String?   // Pelaku diskriminasi atau kekerasan
-  discriminationLocation    String?   // Lokasi kejadian
-  wasDiscriminationReported Boolean?  // Apakah diskriminasi telah dilaporkan?
-
-  // Bantuan Sosial & Komunitas (Social Assistance & Community)
-  receivesSocialAssistance  Boolean?  // Mendapatkan Bantuan sosial dari pemerintah?
-  isRegisteredInDTKS      Boolean?  // Terdaftar dalam Data Terpadu Kesejahteraan Sosial (DTKS)?
-  communityGroup          String?   // Kelompok Komunitas yang Diikuti
-
-  // Add user relationship
-  userId    String? @unique
-  user      User?   @relation(fields: [userId], references: [id])
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  imageUrl    String?
+  authorId    String
+  authorName  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  author      User     @relation(fields: [authorId], references: [id])
+  
+  @@index([authorId])
+  @@index([createdAt])
 }

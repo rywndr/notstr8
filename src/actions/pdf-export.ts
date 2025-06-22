@@ -2,11 +2,11 @@
 
 import prisma from '@/lib/prisma';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { Prisma, EducationLevel, EmploymentStatus } from '../../prisma/app/generated/prisma';
+import { Prisma, EducationLevel, EmploymentStatus, SocialSecurityType } from '../../prisma/app/generated/prisma';
 
 export async function exportMembersToPDF(
   searchQuery?: string,
-  bpjsStatus?: string,
+  socialSecurityTypeFilter?: string,
   socialAssistanceStatus?: string,
   educationLevel?: string,
   employmentStatus?: string
@@ -40,8 +40,9 @@ export async function exportMembersToPDF(
       ];
     }
 
-    if (bpjsStatus === 'true') whereClause.hasBpjs = true;
-    else if (bpjsStatus === 'false') whereClause.hasBpjs = false;
+    if (socialSecurityTypeFilter && socialSecurityTypeFilter !== 'all') {
+      whereClause.socialSecurityType = socialSecurityTypeFilter as SocialSecurityType;
+    }
 
     if (socialAssistanceStatus === 'true') whereClause.receivesSocialAssistance = true;
     else if (socialAssistanceStatus === 'false') whereClause.receivesSocialAssistance = false;

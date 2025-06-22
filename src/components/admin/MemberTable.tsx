@@ -1,51 +1,55 @@
-'use client'
+'use client';
 
-import { MemberTableRow } from './MemberTableRow'
-import type { CommunityMember } from '../../../prisma/app/generated/prisma'
+import { CommunityMember } from '../../../prisma/app/generated/prisma';
+import { MemberTableRow } from './MemberTableRow';
 
 interface MemberTableProps {
-  members: CommunityMember[]
+  members: CommunityMember[];
+  onDelete?: (id: string) => void;
+  onEdit?: (member: CommunityMember) => void;
 }
 
-export function MemberTable({ members }: MemberTableProps) {
+export function MemberTable({ members, onDelete, onEdit }: MemberTableProps) {
+  if (!members || members.length === 0) {
+    return <p className="text-center text-slate-500 py-8">Tidak ada data anggota untuk ditampilkan.</p>;
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nama & Kontak
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Lokasi & Usia
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Pendidikan
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Pekerjaan
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tanggal
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {members.map((member) => (
-              <MemberTableRow key={member.id} member={member} />
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-slate-200">
+      <table className="min-w-full divide-y divide-slate-200">
+        <thead className="bg-slate-50">
+          <tr>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Nama Lengkap
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              NIK
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Telepon
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Kota
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Jaminan Sosial
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Tgl Daftar
+            </th>
+            <th scope="col" className="relative px-6 py-3">
+              <span className="sr-only">Aksi</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-slate-200">
+          {members.map((member) => (
+            <MemberTableRow key={member.id} member={member} onDelete={onDelete} onEdit={onEdit} />
+          ))}
+        </tbody>
+      </table>
     </div>
-  )
+  );
 }
 
-export default MemberTable
+export default MemberTable;
